@@ -1,0 +1,7 @@
+//Test request
+@FoodRestaurantApp_BE_HostAddress = http://localhost:5169
+
+GET {{FoodRestaurantApp_BE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

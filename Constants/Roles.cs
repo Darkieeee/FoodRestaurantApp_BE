@@ -1,6 +1,6 @@
-﻿namespace FoodRestaurantApp_BE.Models
+namespace FoodRestaurantApp_BE.Constants
 {
-    public class SystemRoles
+    class Roles
     {
         public static readonly short Admin = 1;
         public static readonly short Moderator = 2;

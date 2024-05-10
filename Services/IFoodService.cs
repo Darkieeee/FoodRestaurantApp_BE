@@ -1,5 +1,7 @@
-﻿namespace FoodRestaurantApp_BE.Services.Interfaces {
-    public interface IFoodService {
+﻿namespace FoodRestaurantApp_BE.Services
+{
+    public interface IFoodService
+    {
         void GetAll();
         void GetById();
         void Insert();

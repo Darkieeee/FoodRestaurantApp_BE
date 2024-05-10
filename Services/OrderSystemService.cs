@@ -1,11 +1,9 @@
 ﻿using FoodRestaurantApp_BE.Models;
-using FoodRestaurantApp_BE.Services.Interfaces;
 
 namespace FoodRestaurantApp_BE.Services
 {
     public class OrderSystemService : IOrderSystemService {
-        public string GetDetail(string orderSysId)
-        {
+        public string GetDetail(string orderSysId) {
             throw new NotImplementedException();
         }
 

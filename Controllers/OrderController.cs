@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using FoodRestaurantApp_BE.Services.Interfaces;
+using FoodRestaurantApp_BE.Services;
 
-namespace FoodRestaurantApp_BE.Controllers {
+namespace FoodRestaurantApp_BE.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController(IOrderSystemService orderSystemService) : ControllerBase() {

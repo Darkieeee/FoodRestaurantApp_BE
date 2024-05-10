@@ -54,6 +54,7 @@ C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\FoodRestaurantApp_
 C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\FoodRestaurantApp_BE.csproj.CoreCompileInputs.cache
 C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\FoodRestaurantApp_BE.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\FoodRestaurantApp_BE.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\FoodRestaurantApp_BE.sourcelink.json
 C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\Kiet\Documents\FoodRestaurantApp_BE\obj\Debug\net8.0\staticwebassets\msbuild.FoodRestaurantApp_BE.Microsoft.AspNetCore.StaticWebAssets.props

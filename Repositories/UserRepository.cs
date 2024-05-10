@@ -1,6 +1,6 @@
 ﻿
 
-using FoodRestaurantApp_BE.Contexts;
+using FoodRestaurantApp_BE.DbContexts;
 using FoodRestaurantApp_BE.Models.Dto;
 
 namespace FoodRestaurantApp_BE.Repositories {
@@ -20,16 +20,21 @@ namespace FoodRestaurantApp_BE.Repositories {
             return _context.Users.ToList();
         }
 
-        UserDto IUserRepository.GetById(string id) {
-            return _context.Users.First(x => x.Uid.Equals(id));
+        UserDto IUserRepository.FindById(string id) {
+            return _context.Users.First(x => x.Id.Equals(id));
         }
 
-        UserDto IUserRepository.Insert(UserDto t)
-        {
-            throw new NotImplementedException();
+        bool IUserRepository.Insert(UserDto u) {
+            _context.Users.Add(u);
+            
+            try {
+                return _context.SaveChanges() > 0;
+            } catch {
+                return false;
+            }
         }
 
-        UserDto IUserRepository.Update(UserDto t)
+        bool IUserRepository.Update(UserDto u)
         {
             throw new NotImplementedException();
         }
@@ -39,13 +44,21 @@ namespace FoodRestaurantApp_BE.Repositories {
             throw new NotImplementedException();
         }
 
-        int IUserRepository.Save() {
-            return _context.SaveChanges();
-        }
-
         void IDisposable.Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public UserDto? FindByNameAndPassword(string username, string password)
+        {
+            IQueryable<UserDto> users = _context.Users.Where(x => x.Name.Equals(username) && x.Password.Equals(password));
+            return users.FirstOrDefault();
+        }
+
+        public List<UserDto> FindByName(string username)
+        {
+            IQueryable<UserDto> users = _context.Users.Where(x => x.Name.Equals(username) && x.Password.Equals(password));
+            return users.ToList();
         }
     }
 }

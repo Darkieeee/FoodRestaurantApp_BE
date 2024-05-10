@@ -1,6 +1,6 @@
 ﻿using FoodRestaurantApp_BE.Models;
 
-namespace FoodRestaurantApp_BE.Services.Interfaces
+namespace FoodRestaurantApp_BE.Services
 {
     public interface IOrderSystemService
     {

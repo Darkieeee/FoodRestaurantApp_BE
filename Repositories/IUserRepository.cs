@@ -4,10 +4,11 @@ namespace FoodRestaurantApp_BE.Repositories
 {
     public interface IUserRepository: IDisposable {
         List<UserDto> GetAll();
-        UserDto GetById(string id);
-        UserDto Insert(UserDto t);
-        UserDto Update(UserDto t);
+        UserDto FindById(string id);
+        List<UserDto> FindByName(string username);
+        UserDto? FindByNameAndPassword(string username, string password);
+        bool Insert(UserDto t);
+        bool Update(UserDto t);
         bool Delete(UserDto t);
-        int Save();
     }
 }

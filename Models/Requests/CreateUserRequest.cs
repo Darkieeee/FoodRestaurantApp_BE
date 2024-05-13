@@ -1,4 +1,4 @@
-﻿namespace FoodRestaurantApp_BE.Requests
+﻿namespace FoodRestaurantApp_BE.Models.Requests
 {
     public class CreateUserRequest
     {

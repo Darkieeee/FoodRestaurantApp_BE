@@ -1,7 +1,6 @@
-﻿
-
-using FoodRestaurantApp_BE.DbContexts;
-using FoodRestaurantApp_BE.Models.Dto;
+﻿using FoodRestaurantApp_BE.DbContexts;
+using FoodRestaurantApp_BE.Models.Databases;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodRestaurantApp_BE.Repositories {
     public class UserRepository(FoodRestaurantDbContext context) : IUserRepository
@@ -16,15 +15,15 @@ namespace FoodRestaurantApp_BE.Repositories {
             disposed = true;
         }
 
-        List<UserDto> IUserRepository.GetAll() {
+        List<SystemUser> IUserRepository.GetAll() {
             return _context.Users.ToList();
         }
 
-        UserDto IUserRepository.FindById(string id) {
+        SystemUser IUserRepository.FindById(string id) {
             return _context.Users.First(x => x.Id.Equals(id));
         }
 
-        bool IUserRepository.Insert(UserDto u) {
+        bool IUserRepository.Insert(SystemUser u) {
             _context.Users.Add(u);
             
             try {
@@ -34,12 +33,12 @@ namespace FoodRestaurantApp_BE.Repositories {
             }
         }
 
-        bool IUserRepository.Update(UserDto u)
+        bool IUserRepository.Update(SystemUser u)
         {
             throw new NotImplementedException();
         }
 
-        bool IUserRepository.Delete(UserDto t)
+        bool IUserRepository.Delete(SystemUser t)
         {
             throw new NotImplementedException();
         }
@@ -49,15 +48,15 @@ namespace FoodRestaurantApp_BE.Repositories {
             GC.SuppressFinalize(this);
         }
 
-        public UserDto? FindByNameAndPassword(string username, string password)
+        public SystemUser? FindByNameAndPassword(string username, string password)
         {
-            IQueryable<UserDto> users = _context.Users.Where(x => x.Name.Equals(username) && x.Password.Equals(password));
+            IQueryable<SystemUser> users = _context.Users.Where(x => x.Name.Equals(username) && x.Password.Equals(password));
             return users.FirstOrDefault();
         }
 
-        public List<UserDto> FindByName(string username)
+        public List<SystemUser> FindByName(string username)
         {
-            IQueryable<UserDto> users = _context.Users.Where(x => x.Name.Equals(username) && x.Password.Equals(password));
+            IQueryable<SystemUser> users = _context.Users.Where(x => x.Name.Equals(username)).Include(x => x.Role);
             return users.ToList();
         }
     }

@@ -4,6 +4,8 @@ using FoodRestaurantApp_BE.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FoodRestaurantApp_BE.Services.Abstracts;
+using FoodRestaurantApp_BE.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add database to the container
@@ -13,7 +15,7 @@ builder.Services.AddDbContext<FoodRestaurantDbContext>(options =>
 // *****************************
 
 // Add Jwt Security to the container
-var secretKey = builder.Configuration["JwtBearerSettings:SecretKey"];
+var secretKey = builder.Configuration["JwtBearer:SecretKey"];
 var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -29,8 +31,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // *****************************
 
 // Add services to the container
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderSystemService, OrderSystemService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 // *****************************
 
 builder.Services.AddControllers();

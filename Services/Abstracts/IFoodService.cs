@@ -1,4 +1,4 @@
-﻿namespace FoodRestaurantApp_BE.Services
+﻿namespace FoodRestaurantApp_BE.Services.Abstracts
 {
     public interface IFoodService
     {

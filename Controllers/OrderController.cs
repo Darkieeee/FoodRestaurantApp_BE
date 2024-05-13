@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using FoodRestaurantApp_BE.Services;
+using FoodRestaurantApp_BE.Services.Abstracts;
 
 namespace FoodRestaurantApp_BE.Controllers
 {
@@ -8,7 +8,7 @@ namespace FoodRestaurantApp_BE.Controllers
     public class OrderController(IOrderSystemService orderSystemService) : ControllerBase() {
         private readonly IOrderSystemService _orderSystemService = orderSystemService;
 
-        [HttpGet]
+        [HttpGet("detail")]
         public IActionResult GetOrderDetail(string orderId) {
             return Ok(_orderSystemService.GetDetail(orderId));
         }

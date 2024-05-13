@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodRestaurantApp_BE.Migrations
 {
     [DbContext(typeof(FoodRestaurantDbContext))]
-    [Migration("20240513180628_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240513182540_InitializeDatabase")]
+    partial class InitializeDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,7 +193,8 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnName("payment_method");
 
                     b.Property<int>("PlacedBy")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("placed_by");
 
                     b.Property<string>("RecipientAddress")
                         .IsRequired()
@@ -214,7 +215,8 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnName("recipient_phone_number");
 
                     b.Property<short>("Status")
-                        .HasColumnType("smallint");
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
 
                     b.Property<int>("TotalPrice")
                         .HasColumnType("int")
@@ -276,7 +278,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 14, 1, 6, 26, 744, DateTimeKind.Local).AddTicks(5076))
+                        .HasDefaultValue(new DateTime(2024, 5, 14, 1, 25, 39, 620, DateTimeKind.Local).AddTicks(5666))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -328,12 +330,12 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 5, 14, 1, 6, 27, 127, DateTimeKind.Local).AddTicks(8937),
+                            CreatedDate = new DateTime(2024, 5, 14, 1, 25, 39, 831, DateTimeKind.Local).AddTicks(8252),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
                             Name = "admin",
-                            Password = "$2a$11$stTdAZ366wyNB.yvDjf9buuAQKUsWnjKt1TlR9xP5awnXe/.US1Ym",
+                            Password = "$2a$11$o9WvyYNXoVyJoctSYeEimumh/Ujd7CMUzTQd0oJRplwHi2U5ZUhGe",
                             RoleId = 1
                         });
                 });

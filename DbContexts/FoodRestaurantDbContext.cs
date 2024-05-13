@@ -145,7 +145,9 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.Paid).HasColumnName("paid").IsRequired().HasDefaultValue(false);
                 e.Property(x => x.ApprovedBy).HasColumnName("approved_by").IsRequired(false);
                 e.Property(x => x.CancelReason).HasColumnName("cancel_reason").IsRequired(false);
+                e.Property(x => x.PlacedBy).HasColumnName("placed_by").IsRequired();
                 e.Property(x => x.CreatedDate).HasColumnName("created_date").IsRequired();
+                e.Property(x => x.Status).HasColumnName("status").IsRequired();
             });
 
             modelBuilder.Entity<SystemOrder>()

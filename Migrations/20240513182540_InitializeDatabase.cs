@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FoodRestaurantApp_BE.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitializeDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -147,7 +147,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     full_name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 14, 1, 6, 26, 744, DateTimeKind.Local).AddTicks(5076)),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 14, 1, 25, 39, 620, DateTimeKind.Local).AddTicks(5666)),
                     is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     role_id = table.Column<int>(type: "int", maxLength: 10, nullable: false),
                     last_login = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -171,11 +171,11 @@ namespace FoodRestaurantApp_BE.Migrations
                     recipient_name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     recipient_address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     recipient_phone_number = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    PlacedBy = table.Column<int>(type: "int", nullable: false),
+                    placed_by = table.Column<int>(type: "int", nullable: false),
                     total_price = table.Column<int>(type: "int", nullable: false),
                     payment_method = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<short>(type: "smallint", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: false),
                     approved_by = table.Column<int>(type: "int", nullable: true),
                     cancel_reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     paid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
@@ -185,16 +185,16 @@ namespace FoodRestaurantApp_BE.Migrations
                 {
                     table.PrimaryKey("PK_SystemOrders", x => x.id);
                     table.ForeignKey(
-                        name: "FK_SystemOrders_Users_PlacedBy",
-                        column: x => x.PlacedBy,
-                        principalTable: "Users",
-                        principalColumn: "uid",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_SystemOrders_Users_approved_by",
                         column: x => x.approved_by,
                         principalTable: "Users",
                         principalColumn: "uid");
+                    table.ForeignKey(
+                        name: "FK_SystemOrders_Users_placed_by",
+                        column: x => x.placed_by,
+                        principalTable: "Users",
+                        principalColumn: "uid",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -228,7 +228,7 @@ namespace FoodRestaurantApp_BE.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "uid", "created_date", "email", "full_name", "is_active", "last_login", "name", "password", "role_id" },
-                values: new object[] { 1, new DateTime(2024, 5, 14, 1, 6, 27, 127, DateTimeKind.Local).AddTicks(8937), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$stTdAZ366wyNB.yvDjf9buuAQKUsWnjKt1TlR9xP5awnXe/.US1Ym", 1 });
+                values: new object[] { 1, new DateTime(2024, 5, 14, 1, 25, 39, 831, DateTimeKind.Local).AddTicks(8252), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$o9WvyYNXoVyJoctSYeEimumh/Ujd7CMUzTQd0oJRplwHi2U5ZUhGe", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Foods_food_type",
@@ -256,9 +256,9 @@ namespace FoodRestaurantApp_BE.Migrations
                 column: "approved_by");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SystemOrders_PlacedBy",
+                name: "IX_SystemOrders_placed_by",
                 table: "SystemOrders",
-                column: "PlacedBy");
+                column: "placed_by");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_role_id",

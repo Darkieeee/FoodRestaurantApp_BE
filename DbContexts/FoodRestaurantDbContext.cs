@@ -179,6 +179,12 @@ namespace FoodRestaurantApp_BE.DbContexts {
             });
 
             // Seeding data
+            modelBuilder.Entity<Role>().HasData([
+                new Role(Constants.Roles.Admin, "ADMIN", "Quản trị hệ thống"),
+                new Role(Constants.Roles.Employee, "NVIEN", "Nhân viên"),
+                new Role(Constants.Roles.Customer, "KHHANG", "Khách hàng mua sắm"),
+            ]);
+
             modelBuilder.Entity<SystemUser>().HasData([
                 new SystemUser
                 {

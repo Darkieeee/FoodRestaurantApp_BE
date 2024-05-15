@@ -135,6 +135,26 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Quản trị hệ thống",
+                            Name = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Nhân viên",
+                            Name = "NVIEN"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Khách hàng mua sắm",
+                            Name = "KHHANG"
+                        });
                 });
 
             modelBuilder.Entity("FoodRestaurantApp_BE.Models.Databases.RolePermission", b =>
@@ -275,7 +295,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 14, 1, 25, 39, 620, DateTimeKind.Local).AddTicks(5666))
+                        .HasDefaultValue(new DateTime(2024, 5, 15, 8, 37, 20, 221, DateTimeKind.Local).AddTicks(7545))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -327,12 +347,12 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 5, 14, 1, 25, 39, 831, DateTimeKind.Local).AddTicks(8252),
+                            CreatedDate = new DateTime(2024, 5, 15, 8, 37, 20, 587, DateTimeKind.Local).AddTicks(546),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
                             Name = "admin",
-                            Password = "$2a$11$o9WvyYNXoVyJoctSYeEimumh/Ujd7CMUzTQd0oJRplwHi2U5ZUhGe",
+                            Password = "$2a$11$pke9yiAZXzrSl1aqlockmez3kkwFp8tCbWHv0Md.7eHj36bT3C.J6",
                             RoleId = 1
                         });
                 });

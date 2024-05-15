@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace FoodRestaurantApp_BE.Migrations
 {
     /// <inheritdoc />
-    public partial class InitializeDatabase : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -147,7 +149,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     full_name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 14, 1, 25, 39, 620, DateTimeKind.Local).AddTicks(5666)),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 15, 8, 37, 20, 221, DateTimeKind.Local).AddTicks(7545)),
                     is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     role_id = table.Column<int>(type: "int", maxLength: 10, nullable: false),
                     last_login = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -226,9 +228,19 @@ namespace FoodRestaurantApp_BE.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "id", "description", "name" },
+                values: new object[,]
+                {
+                    { 1, "Quản trị hệ thống", "ADMIN" },
+                    { 2, "Nhân viên", "NVIEN" },
+                    { 3, "Khách hàng mua sắm", "KHHANG" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "uid", "created_date", "email", "full_name", "is_active", "last_login", "name", "password", "role_id" },
-                values: new object[] { 1, new DateTime(2024, 5, 14, 1, 25, 39, 831, DateTimeKind.Local).AddTicks(8252), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$o9WvyYNXoVyJoctSYeEimumh/Ujd7CMUzTQd0oJRplwHi2U5ZUhGe", 1 });
+                values: new object[] { 1, new DateTime(2024, 5, 15, 8, 37, 20, 587, DateTimeKind.Local).AddTicks(546), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$pke9yiAZXzrSl1aqlockmez3kkwFp8tCbWHv0Md.7eHj36bT3C.J6", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Foods_food_type",

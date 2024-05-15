@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FoodRestaurantApp_BE.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDatabase : Migration
+    public partial class InitTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Price = table.Column<int>(type: "int", nullable: false)
+                    price = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,7 +76,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     price = table.Column<int>(type: "int", nullable: false),
-                    MaxToppings = table.Column<int>(type: "int", nullable: false),
+                    max_toppings = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     slug = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     food_type = table.Column<int>(type: "int", nullable: false)
                 },
@@ -87,30 +87,6 @@ namespace FoodRestaurantApp_BE.Migrations
                         name: "FK_Foods_FoodTypes_food_type",
                         column: x => x.food_type,
                         principalTable: "FoodTypes",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PermissionRole",
-                columns: table => new
-                {
-                    PermissionsId = table.Column<string>(type: "nvarchar(6)", nullable: false),
-                    RolesId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PermissionRole", x => new { x.PermissionsId, x.RolesId });
-                    table.ForeignKey(
-                        name: "FK_PermissionRole_Permissions_PermissionsId",
-                        column: x => x.PermissionsId,
-                        principalTable: "Permissions",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PermissionRole_Roles_RolesId",
-                        column: x => x.RolesId,
-                        principalTable: "Roles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -149,7 +125,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     full_name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 15, 8, 37, 20, 221, DateTimeKind.Local).AddTicks(7545)),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 15, 14, 45, 47, 349, DateTimeKind.Local).AddTicks(9516)),
                     is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     role_id = table.Column<int>(type: "int", maxLength: 10, nullable: false),
                     last_login = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -240,17 +216,12 @@ namespace FoodRestaurantApp_BE.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "uid", "created_date", "email", "full_name", "is_active", "last_login", "name", "password", "role_id" },
-                values: new object[] { 1, new DateTime(2024, 5, 15, 8, 37, 20, 587, DateTimeKind.Local).AddTicks(546), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$pke9yiAZXzrSl1aqlockmez3kkwFp8tCbWHv0Md.7eHj36bT3C.J6", 1 });
+                values: new object[] { 1, new DateTime(2024, 5, 15, 14, 45, 47, 524, DateTimeKind.Local).AddTicks(5613), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$g9FCoWk0uYvBqwChw3QuZehUx2Cxn6HdZYmqti7/TsUhjRr.HxMT.", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Foods_food_type",
                 table: "Foods",
                 column: "food_type");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionRole_RolesId",
-                table: "PermissionRole",
-                column: "RolesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolesPermissions_permission_id",
@@ -281,9 +252,6 @@ namespace FoodRestaurantApp_BE.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "PermissionRole");
-
             migrationBuilder.DropTable(
                 name: "RolesPermissions");
 

@@ -38,7 +38,10 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnName("description");
 
                     b.Property<int>("MaxToppings")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("max_toppings");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -295,7 +298,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 15, 8, 37, 20, 221, DateTimeKind.Local).AddTicks(7545))
+                        .HasDefaultValue(new DateTime(2024, 5, 15, 14, 45, 47, 349, DateTimeKind.Local).AddTicks(9516))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -347,12 +350,12 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 5, 15, 8, 37, 20, 587, DateTimeKind.Local).AddTicks(546),
+                            CreatedDate = new DateTime(2024, 5, 15, 14, 45, 47, 524, DateTimeKind.Local).AddTicks(5613),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
                             Name = "admin",
-                            Password = "$2a$11$pke9yiAZXzrSl1aqlockmez3kkwFp8tCbWHv0Md.7eHj36bT3C.J6",
+                            Password = "$2a$11$g9FCoWk0uYvBqwChw3QuZehUx2Cxn6HdZYmqti7/TsUhjRr.HxMT.",
                             RoleId = 1
                         });
                 });
@@ -373,26 +376,12 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnName("name");
 
                     b.Property<int>("Price")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("price");
 
                     b.HasKey("Id");
 
                     b.ToTable("Toppings", (string)null);
-                });
-
-            modelBuilder.Entity("PermissionRole", b =>
-                {
-                    b.Property<string>("PermissionsId")
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<int>("RolesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PermissionsId", "RolesId");
-
-                    b.HasIndex("RolesId");
-
-                    b.ToTable("PermissionRole");
                 });
 
             modelBuilder.Entity("FoodRestaurantApp_BE.Models.Databases.Food", b =>
@@ -470,21 +459,6 @@ namespace FoodRestaurantApp_BE.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("PermissionRole", b =>
-                {
-                    b.HasOne("FoodRestaurantApp_BE.Models.Databases.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("PermissionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FoodRestaurantApp_BE.Models.Databases.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RolesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FoodRestaurantApp_BE.Models.Databases.FoodType", b =>

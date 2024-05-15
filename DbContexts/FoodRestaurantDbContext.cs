@@ -57,6 +57,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(e => e.Description).HasColumnName("description").HasMaxLength(100).IsRequired();
                 e.Property(e => e.Slug).HasColumnName("slug").HasMaxLength(250).IsRequired();
                 e.Property(e => e.TypeId).HasColumnName("food_type").IsRequired();
+                e.Property(e => e.MaxToppings).HasColumnName("max_toppings").HasDefaultValue(0);
             });
 
             modelBuilder.Entity<Food>()
@@ -72,6 +73,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
 
                 e.Property(e => e.Id).HasColumnName("id").UseIdentityColumn(1, 1);
                 e.Property(e => e.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
+                e.Property(e => e.Price).HasColumnName("price").IsRequired();
             });
 
             // Mapping Model Users với table Users trong database
@@ -159,6 +161,14 @@ namespace FoodRestaurantApp_BE.DbContexts {
                         .WithMany(e => e.SystemOrders)
                         .HasForeignKey(e => e.PlacedBy);
 
+            modelBuilder.Entity<Permission>(e => {
+                e.ToTable("Permissions");
+
+                e.HasKey(col => col.Id);
+
+                e.Property(x => x.Id).HasColumnName("id").IsRequired().HasMaxLength(6);
+                e.Property(x => x.Name).HasColumnName("name").IsRequired().HasMaxLength(50);
+            });
 
             modelBuilder.Entity<RolePermission>(e => {
                 e.ToTable("RolesPermissions");
@@ -169,14 +179,13 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.PermissionId).HasColumnName("permission_id").IsRequired().HasMaxLength(6);
             });
 
-            modelBuilder.Entity<Permission>(e => {
-                e.ToTable("Permissions");
-
-                e.HasKey(col => col.Id);
-
-                e.Property(x => x.Id).HasColumnName("id").IsRequired().HasMaxLength(6);
-                e.Property(x => x.Name).HasColumnName("name").IsRequired().HasMaxLength(50);
-            });
+            modelBuilder.Entity<Role>()
+                        .HasMany(e => e.Permissions)
+                        .WithMany(e => e.Roles)
+                        .UsingEntity<RolePermission>(
+                            l => l.HasOne(e => e.Permission).WithMany().HasForeignKey(e => e.PermissionId),
+                            r => r.HasOne(e => e.Role).WithMany().HasForeignKey(e => e.RoleId)
+                        );
 
             // Seeding data
             modelBuilder.Entity<Role>().HasData([

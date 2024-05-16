@@ -43,7 +43,7 @@ namespace FoodRestaurantApp_BE.Services
                     result.Message = "User authentication is valid";
                     result.UserId = user.Id;
                     result.UserName = user.Name;
-                    result.RoleName = user.Role.Name;
+                    result.RoleName = user.Role.Description;
                     result.Token = token;
                 }
             }

@@ -30,9 +30,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 });
 // *****************************
 
-// Add services to the container
+// Add repositories to the container
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+// *****************************
+
+// Add services to the container
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IOrderSystemService, OrderSystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 // *****************************

@@ -1,5 +1,7 @@
-﻿using FoodRestaurantApp_BE.Models.Requests;
-using FoodRestaurantApp_BE.Models.Securities;
+﻿using FoodRestaurantApp_BE.Filters;
+using FoodRestaurantApp_BE.Helpers;
+using FoodRestaurantApp_BE.Models.DTOs;
+using FoodRestaurantApp_BE.Models.Requests;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,55 +10,43 @@ namespace FoodRestaurantApp_BE.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
     public class AuthController(IAuthService authService) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
 
         /// <summary>
-        /// Xác thực và cấp phát token cho người dùng là Customer
+        /// Xác thực và cấp phát token cho người dùng
         /// </summary>
         /// <param name="request">Yêu cầu đăng nhập</param>
         /// <returns></returns>
-        [HttpPost("customer/sign-in")]
-        public IActionResult AuthenticateUserAsCustomer([FromBody] SignInRequest request)
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] SignInRequest request)
         {
-            AuthResult result = _authService.VerifyUser(request.Username, request.Password, true);
-
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
+            AuthDto result = await _authService.VerifyUserAsync(request.Username, request.Password);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
 
         /// <summary>
-        /// Xác thực và cấp phát token cho người dùng không phải là Customer
+        /// Đăng xuất người dùng
         /// </summary>
-        /// <param name="request">Yêu cầu đăng nhập</param>
         /// <returns></returns>
-        [HttpPost("admin/sign-in")]
-        public IActionResult AuthenticateUserAsNotCustomer([FromBody] SignInRequest request)
+        [HttpPost("logout")]
+        [Authorize]
+        [ValidateTokenExpires]
+        public async Task<IActionResult> Logout()
         {
-            AuthResult result = _authService.VerifyUser(request.Username, request.Password, false);
-
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
+            LogoutDto result = await _authService.LogoutAsync(HttpContext.GetBearerToken()!);
+            return Ok(result);
         }
 
-        [HttpPost("customer/sign-up")]
-        public IActionResult SignUpAsCustomer()
+
+        [HttpPost("refresh-token")]
+        [Authorize]
+        [ValidateTokenExpires]
+        public IActionResult RefreshToken()
         {
-            return Ok();
+            throw new NotImplementedException("Not implemented yet");
         }
     }
 }

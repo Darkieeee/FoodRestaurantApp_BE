@@ -5,8 +5,9 @@ namespace FoodRestaurantApp_BE.Repositories
     public interface IRepository<T> where T: class
     {
         List<T> GetAll();
-        bool Insert(T t);
-        bool Update(T t);
-        bool Delete(T t);
+        int Insert(T t);
+        int Update(T t);
+        Task<int> UpdateAsync(T t);
+        int Delete(T t);
     }
 }

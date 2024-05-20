@@ -12,6 +12,16 @@ namespace FoodRestaurantApp_BE.Services
             return _userRepository.FindByName(username);
         }
 
+        public bool Update(SystemUser user)
+        {
+            return UpdateAsync(user).Result;
+        }
+
+        public async Task<bool> UpdateAsync(SystemUser user)
+        {
+            return await _userRepository.UpdateAsync(user) > 0;
+        }
+
         List<SystemUser> IUserService.GetAll() {
             return _userRepository.GetAll();
         }

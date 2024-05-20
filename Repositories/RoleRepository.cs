@@ -7,7 +7,7 @@ namespace FoodRestaurantApp_BE.Repositories
     {
         private readonly FoodRestaurantDbContext _dbContext = dbContext;
 
-        public bool Delete(Role t)
+        public int Delete(Role t)
         {
             throw new NotImplementedException();
         }
@@ -23,12 +23,17 @@ namespace FoodRestaurantApp_BE.Repositories
             throw new NotImplementedException();
         }
 
-        public bool Insert(Role t)
+        public int Insert(Role t)
         {
             throw new NotImplementedException();
         }
 
-        public bool Update(Role t)
+        public int Update(Role t)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> UpdateAsync(Role t)
         {
             throw new NotImplementedException();
         }

@@ -2,7 +2,7 @@
 
 namespace FoodRestaurantApp_BE.Repositories
 {
-    public interface IUserRepository: IDisposable, IRepository<SystemUser>
+    public interface IUserRepository: IRepository<SystemUser>
     {
         SystemUser? FindById(int id);
         List<SystemUser> FindByName(string username);

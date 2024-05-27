@@ -5,15 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FoodRestaurantApp_BE.Repositories {
 	public class UserRepository(FoodRestaurantDbContext dbContext): IUserRepository
 	{
-		private bool disposed = false;
 		private readonly FoodRestaurantDbContext _dbContext = dbContext;
-
-		protected virtual void Dispose(bool disposing) {
-			if(!disposed && disposing) {
-				_dbContext.Dispose();
-			}
-			disposed = true;
-		}
 
 		public List<SystemUser> GetAll() {
 			return _dbContext.Users.ToList();
@@ -23,29 +15,24 @@ namespace FoodRestaurantApp_BE.Repositories {
 			return _dbContext.Users.First(x => x.Id.Equals(id));
 		}
 
-		public bool Insert(SystemUser u) {
+		public int Insert(SystemUser u) {
 			_dbContext.Users.Add(u);
 			
 			try {
-				return _dbContext.SaveChanges() > 0;
+				return _dbContext.SaveChanges();
 			} catch {
-				return false;
+				return -1;
 			}
 		}
 
-		public bool Update(SystemUser u)
+		public int Update(SystemUser u)
 		{
-			throw new NotImplementedException();
+			return UpdateAsync(u).Result;
 		}
 
-		public bool Delete(SystemUser t)
+		public int Delete(SystemUser t)
 		{
 			throw new NotImplementedException();
-		}
-
-		void IDisposable.Dispose() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
 		}
 
 		public SystemUser? FindByNameAndPassword(string username, string password)
@@ -62,5 +49,11 @@ namespace FoodRestaurantApp_BE.Repositories {
 														   .Include(x => x.Role);
 			return users.ToList();
 		}
-	}
+
+        public async Task<int> UpdateAsync(SystemUser t)
+        {
+            _dbContext.Update(t);
+            return await _dbContext.SaveChangesAsync();
+        }
+    }
 }

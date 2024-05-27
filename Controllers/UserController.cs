@@ -1,6 +1,4 @@
-﻿using FoodRestaurantApp_BE.Models.Requests;
-using FoodRestaurantApp_BE.Models.Securities;
-using FoodRestaurantApp_BE.Services.Abstracts;
+﻿using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

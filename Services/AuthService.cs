@@ -59,6 +59,7 @@ namespace FoodRestaurantApp_BE.Services
                     result.UserId = user.Id;
                     result.UserName = user.Name;
                     result.RoleName = user.Role.Description;
+                    result.IsAdmin = user.Role.Id != Constants.Roles.Customer;
                     result.Token = token;
 
                     await _cache.SetRecordAsync(token, true);

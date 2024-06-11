@@ -1,10 +1,14 @@
-﻿using FoodRestaurantApp_BE.Filters;
+﻿using Azure.Core;
+using FoodRestaurantApp_BE.Filters;
 using FoodRestaurantApp_BE.Helpers;
+using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Models.Requests;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodRestaurantApp_BE.Controllers
 {
@@ -47,6 +51,18 @@ namespace FoodRestaurantApp_BE.Controllers
         public IActionResult RefreshToken()
         {
             throw new NotImplementedException("Not implemented yet");
+        }
+
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] SignUpRequest register)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = _authService.Register(register);
+            return Ok(result);
         }
     }
 }

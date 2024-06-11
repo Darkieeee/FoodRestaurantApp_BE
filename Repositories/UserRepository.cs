@@ -55,5 +55,12 @@ namespace FoodRestaurantApp_BE.Repositories {
             _dbContext.Update(t);
             return await _dbContext.SaveChangesAsync();
         }
+
+		public SystemUser? FindUserByName(string name)
+		{
+            IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Name.Equals(name))
+														    .Include(x => x.Role);
+            return users.FirstOrDefault();
+        }
     }
 }

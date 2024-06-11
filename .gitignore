@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+.vs/
+obj/
+bin
+/FoodRestaurantApp_BE.csproj.user
+/appsettings.json

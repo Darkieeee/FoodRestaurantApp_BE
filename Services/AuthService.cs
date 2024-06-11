@@ -5,17 +5,23 @@ using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
+using FoodRestaurantApp_BE.Constants;
+using FoodRestaurantApp_BE.Models.Requests;
+
 
 namespace FoodRestaurantApp_BE.Services
 {
     public class AuthService(IUserService userService, IConfiguration configuration, 
-                             IDistributedCache cache) : IAuthService
+                             IDistributedCache cache, IRoleService roleService) : IAuthService
     {
         private readonly IUserService _userService = userService;
         private readonly IConfiguration _configuration = configuration;
         private readonly IDistributedCache _cache = cache;
+        private readonly IRoleService _roleService = roleService;
+
 
 
         public AuthDto VerifyUser(string username, string password)
@@ -26,6 +32,47 @@ namespace FoodRestaurantApp_BE.Services
         public LogoutDto Logout(string token)
         {
             return LogoutAsync(token).Result;
+        }
+
+        public RegisterDto Register(SignUpRequest newUser)
+        {
+            SystemUser? user = _userService.GetUser(newUser.name);
+            if (user == null)
+            {
+                RegisterDto result = new RegisterDto
+                {
+                    Code = 201,
+                    Message = "Success",
+                    RoleName = Roles.Customer.ToString(),
+                    Name = newUser.name,
+                    Success = true,
+                };
+                Role role = _roleService.FindById(3);
+                SystemUser registerUser = new SystemUser
+                {
+                    Email = newUser.email,
+                    FullName = newUser.fullName,
+                    Name = newUser.name,
+                    Password = BCrypt.Net.BCrypt.HashPassword(newUser.password),
+                    RoleId = 3,
+                    Role = role
+                };
+                SystemUser? createUser = _userService.CreateUser(registerUser);
+                if (createUser != null)
+                {
+                    return result;
+                }
+
+            }
+            return new RegisterDto
+            {
+                Code = 302,
+                Message = "Already have user",
+                RoleName = Roles.Customer.ToString(),
+                Name = newUser.name,
+                Success = false,
+            };
+
         }
 
         public async Task<AuthDto> VerifyUserAsync(string username, string password)

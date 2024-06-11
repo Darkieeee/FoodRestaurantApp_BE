@@ -1,11 +1,20 @@
 ﻿using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoodRestaurantApp_BE.Services
 {
-    public class UserService(IUserRepository userRepository) : IUserService {
-        private readonly IUserRepository _userRepository = userRepository;
+    public class UserService : IUserService
+    {
+        private readonly IUserRepository _userRepository;
+
+        // Correct constructor definition
+        public UserService(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
 
         public List<SystemUser> FindUsersByName(string username)
         {
@@ -22,8 +31,25 @@ namespace FoodRestaurantApp_BE.Services
             return await _userRepository.UpdateAsync(user) > 0;
         }
 
-        List<SystemUser> IUserService.GetAll() {
+        public List<SystemUser> GetAll()
+        {
             return _userRepository.GetAll();
+        }
+
+        public SystemUser? GetUser(string name)
+        {
+            return _userRepository.FindUserByName(name);
+        }
+
+        public SystemUser? CreateUser(SystemUser user)
+        {
+            int result = _userRepository.Insert(user);
+
+            if (result == 1)
+            {
+                return _userRepository.FindUserByName(user.Name);
+            }
+            return null;
         }
     }
 }

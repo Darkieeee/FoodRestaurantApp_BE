@@ -300,7 +300,7 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValue(new DateTime(2024, 5, 15, 14, 45, 47, 349, DateTimeKind.Local).AddTicks(9516))
                         .HasColumnName("created_date");
-
+                      
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -355,7 +355,7 @@ namespace FoodRestaurantApp_BE.Migrations
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
                             Name = "admin",
-                            Password = "$2a$11$g9FCoWk0uYvBqwChw3QuZehUx2Cxn6HdZYmqti7/TsUhjRr.HxMT.",
+                            Password = "aaa123",
                             RoleId = 1
                         });
                 });

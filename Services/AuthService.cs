@@ -98,6 +98,32 @@ namespace FoodRestaurantApp_BE.Services
             return _webTokenHandler.WriteToken(token);
         }
 
+        public async Task<bool> SignUpAsync(SignUpDto signUpDto)
+        {
+            signUpDto.Validate();
+
+            if(!signUpDto.HasAnyError())
+            {
+                SystemUser user = new()
+                {
+                    Name = signUpDto.Username,
+                    Email = signUpDto.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(signUpDto.Password),
+                    FullName = signUpDto.FullName,
+                    RoleId = Constants.Roles.Customer,
+                    IsActive = true,
+                };
+
+                await _userService.CreateAsync(user);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<LogoutDto> LogoutAsync(string tokenId)
         {
             LogoutDto logoutResult = new();
@@ -116,6 +142,11 @@ namespace FoodRestaurantApp_BE.Services
             }
 
             return logoutResult;
+        }
+
+        public bool SignUp(SignUpDto signUpDto)
+        {
+            return SignUpAsync(signUpDto).Result;
         }
     }
 }

@@ -7,6 +7,16 @@ namespace FoodRestaurantApp_BE.Services
     public class UserService(IUserRepository userRepository) : IUserService {
         private readonly IUserRepository _userRepository = userRepository;
 
+        public bool Create(SystemUser user)
+        {
+            return CreateAsync(user).Result;
+        }
+
+        public async Task<bool> CreateAsync(SystemUser user)
+        {
+            return await _userRepository.InsertAsync(user) > 0;
+        }
+
         public List<SystemUser> FindUsersByName(string username)
         {
             return _userRepository.FindByName(username);

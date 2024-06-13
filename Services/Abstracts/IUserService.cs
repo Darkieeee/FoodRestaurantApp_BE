@@ -6,7 +6,9 @@ namespace FoodRestaurantApp_BE.Services.Abstracts
     {
         List<SystemUser> GetAll();
         List<SystemUser> FindUsersByName(string username);
+        bool Create(SystemUser user);
         bool Update(SystemUser user);
         Task<bool> UpdateAsync(SystemUser user);
+        Task<bool> CreateAsync(SystemUser user);
     }
 }

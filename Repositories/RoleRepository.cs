@@ -28,6 +28,11 @@ namespace FoodRestaurantApp_BE.Repositories
             throw new NotImplementedException();
         }
 
+        public Task<int> InsertAsync(Role t)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Update(Role t)
         {
             throw new NotImplementedException();

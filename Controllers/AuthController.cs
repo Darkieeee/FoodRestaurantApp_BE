@@ -40,6 +40,12 @@ namespace FoodRestaurantApp_BE.Controllers
             return Ok(result);
         }
 
+        [HttpPost("sign-up")]
+        public async Task<ActionResult> SignUp(SignUpDto signupDto)
+        {
+            bool success = await _authService.SignUpAsync(signupDto);
+            return success ? Ok("Đăng ký thành công") : BadRequest("Đăng ký thất bại");
+        }
 
         [HttpPost("refresh-token")]
         [Authorize]

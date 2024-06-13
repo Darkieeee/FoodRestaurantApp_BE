@@ -52,7 +52,13 @@ namespace FoodRestaurantApp_BE.Repositories {
 
         public async Task<int> UpdateAsync(SystemUser t)
         {
-            _dbContext.Update(t);
+            _dbContext.Users.Update(t);
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> InsertAsync(SystemUser t)
+        {
+            _dbContext.Users.Add(t);
             return await _dbContext.SaveChangesAsync();
         }
     }

@@ -126,7 +126,7 @@ namespace FoodRestaurantApp_BE.Services
 
             if(registered) {
                 result.Success = true;
-                result.Message = "Registration succeed";
+                result.Message = "Registration succeeded";
                 result.Code = 0;
             } else{
                 result.Success = false;
@@ -143,7 +143,7 @@ namespace FoodRestaurantApp_BE.Services
             await _cache.SetRecordAsync(tokenId, true);
 
             logoutResult.Success = true;
-            logoutResult.Message = "Logout succeed";
+            logoutResult.Message = "Logout succeeded";
       
             return logoutResult;
         }

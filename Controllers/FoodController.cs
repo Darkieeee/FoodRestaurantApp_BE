@@ -1,9 +1,13 @@
-﻿using FoodRestaurantApp_BE.Models.DTOs;
+﻿using FoodRestaurantApp_BE.Filters;
+using FoodRestaurantApp_BE.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodRestaurantApp_BE.Controllers
 {
     [ApiController]
+    [Authorize]
+    [ValidToken]
     public class FoodController : ControllerBase
     {
         [HttpPost("create")]

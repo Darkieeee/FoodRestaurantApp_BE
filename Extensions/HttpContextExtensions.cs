@@ -1,10 +1,19 @@
-﻿namespace FoodRestaurantApp_BE.Helpers
+﻿using Microsoft.IdentityModel.Tokens;
+using System.Net.Http.Headers;
+
+namespace FoodRestaurantApp_BE.Helpers
 {
     public static class HttpContextExtensions
     {
-        public static string GetBearerToken(this HttpContext httpContext) 
+        public static string? GetBearerToken(this HttpContext httpContext) 
         {
-            return httpContext.Request.Headers.Authorization[0]?.Split(" ")[1] ?? "";
+            var authorization = httpContext.Request.Headers.Authorization;
+
+            if(AuthenticationHeaderValue.TryParse(authorization, out var headerValue))
+            {
+                return headerValue.Parameter;    
+            }
+            return null;
         }
     }
 }

@@ -2,6 +2,7 @@
 using FoodRestaurantApp_BE.Helpers;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FoodRestaurantApp_BE.Middlewares
 {
@@ -12,7 +13,7 @@ namespace FoodRestaurantApp_BE.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            string? token = context.GetBearerToken();
+            string token = context.GetBearerToken() ?? "";
             var endpoint = context.Features.Get<IEndpointFeature>()?.Endpoint;
             var attribute = endpoint?.Metadata.GetMetadata<ValidTokenAttribute>();
 
@@ -22,7 +23,7 @@ namespace FoodRestaurantApp_BE.Middlewares
                 return;
             }
 
-            if(token == null)
+            if(token.IsNullOrEmpty())
             {
                 throw new UnauthorizedAccessException("Missing bearer token");
             }

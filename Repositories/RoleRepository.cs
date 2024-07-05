@@ -18,12 +18,17 @@ namespace FoodRestaurantApp_BE.Repositories
             return role.FirstOrDefault();
         }
 
-        public List<Role> GetAll()
+        public IQueryable<Role> GetAll()
         {
             throw new NotImplementedException();
         }
 
         public int Insert(Role t)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> InsertAsync(Role t)
         {
             throw new NotImplementedException();
         }

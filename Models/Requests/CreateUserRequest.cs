@@ -1,4 +1,6 @@
-﻿namespace FoodRestaurantApp_BE.Models.Requests
+﻿using FoodRestaurantApp_BE.Models.DTOs;
+
+namespace FoodRestaurantApp_BE.Models.Requests
 {
     public class CreateUserRequest
     {

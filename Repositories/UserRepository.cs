@@ -7,12 +7,12 @@ namespace FoodRestaurantApp_BE.Repositories {
 	{
 		private readonly FoodRestaurantDbContext _dbContext = dbContext;
 
-		public List<SystemUser> GetAll() {
-			return _dbContext.Users.ToList();
+		public IQueryable<SystemUser> GetAll() {
+			return _dbContext.Users;
 		}
 
-		public SystemUser? FindById(int id) {
-			return _dbContext.Users.First(x => x.Id.Equals(id));
+		public IQueryable<SystemUser> FindById(int id) {
+			return _dbContext.Users.Where(x => x.Id.Equals(id));
 		}
 
 		public int Insert(SystemUser u) {
@@ -35,24 +35,28 @@ namespace FoodRestaurantApp_BE.Repositories {
 			throw new NotImplementedException();
 		}
 
-		public SystemUser? FindByNameAndPassword(string username, string password)
+		public IQueryable<SystemUser> FindByNameAndPassword(string username, string password)
 		{
-			IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Name.Equals(username) 
-																	&& x.Password.Equals(password))
-														   .Include(x => x.Role);
-			return users.FirstOrDefault();
+			IQueryable<SystemUser> user = _dbContext.Users.Where(x => x.Name.Equals(username) 
+																   && x.Password.Equals(password));
+			return user;
 		}
 
-		public List<SystemUser> FindByName(string username)
+		public IQueryable<SystemUser> FindByName(string username)
 		{
-			IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Name.Equals(username))
-														   .Include(x => x.Role);
-			return users.ToList();
-		}
+			IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Name.Equals(username));
+			return users;
+        }
 
         public async Task<int> UpdateAsync(SystemUser t)
         {
-            _dbContext.Update(t);
+            _dbContext.Users.Update(t);
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> InsertAsync(SystemUser t)
+        {
+            _dbContext.Users.Add(t);
             return await _dbContext.SaveChangesAsync();
         }
     }

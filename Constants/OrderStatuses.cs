@@ -1,6 +1,6 @@
 namespace FoodRestaurantApp_BE.Constants
 {
-    class OrderStatuses
+    internal static class OrderStatuses
     {
         public static readonly short AWAITING_PAYMENT = 0;
         public static readonly short AWAITING_APPROVAL = 1;

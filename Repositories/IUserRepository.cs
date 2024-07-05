@@ -4,8 +4,8 @@ namespace FoodRestaurantApp_BE.Repositories
 {
     public interface IUserRepository: IRepository<SystemUser>
     {
-        SystemUser? FindById(int id);
-        List<SystemUser> FindByName(string username);
-        SystemUser? FindByNameAndPassword(string username, string password);
+        IQueryable<SystemUser> FindById(int id);
+        IQueryable<SystemUser> FindByName(string username);
+        IQueryable<SystemUser> FindByNameAndPassword(string username, string password);
     }
 }

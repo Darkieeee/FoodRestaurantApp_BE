@@ -17,7 +17,6 @@ namespace FoodRestaurantApp_BE.Services
         private readonly IConfiguration _configuration = configuration;
         private readonly IDistributedCache _cache = cache;
 
-
         public AuthDto VerifyUser(string username, string password)
         {
             return VerifyUserAsync(username, password).Result;
@@ -37,7 +36,7 @@ namespace FoodRestaurantApp_BE.Services
             {
                 result.Success = false;
                 result.Code = AuthDto.WRONG_USERNAME;
-                result.Message = "Sai tên đăng nhập";
+                result.Message = "Wrong username";
             }
             else
             {
@@ -45,7 +44,7 @@ namespace FoodRestaurantApp_BE.Services
                 {
                     result.Success = false;
                     result.Code = AuthDto.WRONG_PASSWORD;
-                    result.Message = "Sai mật khẩu";
+                    result.Message = "Wrong password";
                 }
                 else
                 {
@@ -55,14 +54,15 @@ namespace FoodRestaurantApp_BE.Services
 
                     result.Success = true;
                     result.Code = AuthDto.IS_VALID;
-                    result.Message = "Xác thực hợp lệ";
+                    result.Message = "Valid authentication";
                     result.UserId = user.Id;
                     result.UserName = user.Name;
                     result.RoleName = user.Role.Description;
                     result.IsAdmin = user.Role.Id != Constants.Roles.Customer;
                     result.Token = token;
 
-                    await _cache.SetRecordAsync(token, true);
+                    TimeSpan duration = TimeSpan.FromMinutes(15);
+
                     await _userService.UpdateAsync(user);
                 }
             }
@@ -99,24 +99,58 @@ namespace FoodRestaurantApp_BE.Services
             return _webTokenHandler.WriteToken(token);
         }
 
+        public async Task<RegisterDto> SignUpAsync(SignUpDto request)
+        {
+            RegisterDto result = new();
+
+            if(_userService.FindUsersByName(request.Username).Count > 0)
+            {
+                result.Success = false;
+                result.Code = 32;
+                result.Message = "Username has already existed";
+
+                return result;
+            }
+
+            SystemUser user = new()
+            {
+                Name = request.Username,
+                Email = request.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                FullName = request.FullName,
+                RoleId = Constants.Roles.Customer,
+                IsActive = true,
+            };
+
+            bool registered = await _userService.CreateAsync(user);
+
+            if(registered) {
+                result.Success = true;
+                result.Message = "Registration succeed";
+                result.Code = 0;
+            } else{
+                result.Success = false;
+                result.Message = "Registration failed";
+                result.Code = 33;
+            }
+            return result;
+        }
+
         public async Task<LogoutDto> LogoutAsync(string tokenId)
         {
             LogoutDto logoutResult = new();
-            
-            try
-            {
-                await _cache.SetRecordAsync(tokenId, false);
-                
-                logoutResult.Success = true;
-                logoutResult.Message = "Đăng xuất thành công";
-            } 
-            catch 
-            {
-                logoutResult.Success = false;
-                logoutResult.Message = "Đã xảy ra lỗi! Vui lòng thử lại sau";
-            }
 
+            await _cache.SetRecordAsync(tokenId, true);
+
+            logoutResult.Success = true;
+            logoutResult.Message = "Logout succeed";
+      
             return logoutResult;
+        }
+
+        public RegisterDto SignUp(SignUpDto signUpDto)
+        {
+            return SignUpAsync(signUpDto).Result;
         }
     }
 }

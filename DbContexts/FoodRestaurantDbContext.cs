@@ -90,8 +90,11 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.RoleId).HasColumnName("role_id").IsRequired().HasMaxLength(10);
                 e.Property(x => x.CreatedDate).HasColumnName("created_date").HasDefaultValue(DateTime.Now);
                 e.Property(x => x.IsActive).HasColumnName("is_active").IsRequired().HasDefaultValue(true);
-                e.Property(x => x.LastLogin).HasColumnName("last_login");
+                e.Property(x => x.LastLogin).HasColumnName("last_login");   
             });
+
+            modelBuilder.Entity<SystemUser>().HasIndex(e => e.Name).IsUnique();
+            modelBuilder.Entity<SystemUser>().HasIndex(e => e.Email).IsUnique();
 
             // Mapping Model Roles với table Roles trong database
             modelBuilder.Entity<Role>(e => {

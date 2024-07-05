@@ -4,7 +4,7 @@ namespace FoodRestaurantApp_BE.Repositories
 {
     public interface IRepository<T> where T: class
     {
-        List<T> GetAll();
+        IQueryable<T> GetAll();
         int Insert(T t);
         int Update(T t);
         Task<int> InsertAsync(T t);

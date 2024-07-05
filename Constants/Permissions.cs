@@ -1,6 +1,6 @@
 namespace FoodRestaurantApp_BE.Constants
 {
-    class Permissions
+    internal static class Permissions
     {
         public static readonly string ADM001 = "Xem danh sách đơn hàng";
         public static readonly string ADM002 = "Duyệt/hủy đơn hàng mới";

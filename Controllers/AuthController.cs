@@ -1,4 +1,5 @@
-﻿using FoodRestaurantApp_BE.Filters;
+﻿using FluentValidation;
+using FoodRestaurantApp_BE.Filters;
 using FoodRestaurantApp_BE.Helpers;
 using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Models.Requests;
@@ -23,6 +24,7 @@ namespace FoodRestaurantApp_BE.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] SignInRequest request)
         {
+            
             AuthDto result = await _authService.VerifyUserAsync(request.Username, request.Password);
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -32,24 +34,35 @@ namespace FoodRestaurantApp_BE.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("logout")]
+        [ValidToken]
         [Authorize]
-        [ValidateTokenExpires]
         public async Task<IActionResult> Logout()
         {
             LogoutDto result = await _authService.LogoutAsync(HttpContext.GetBearerToken()!);
-            return Ok(result);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost("sign-up")]
-        public async Task<ActionResult> SignUp(SignUpDto signupDto)
+        public async Task<ActionResult> SignUp(IValidator<SignUpDto> validator,[FromBody] SignUpDto request)
         {
-            bool success = await _authService.SignUpAsync(signupDto);
-            return success ? Ok("Đăng ký thành công") : BadRequest("Đăng ký thất bại");
+            var validated = await validator.ValidateAsync(request);
+
+            if(!validated.IsValid)
+            {
+                ErrorDto errorResponse = new()
+                {
+                   Title = "Input validation failed",
+                   Messages = validated.Errors.Select(x => x.ErrorMessage).ToList()
+                };
+                return BadRequest(errorResponse);
+            }
+
+            RegisterDto result = await _authService.SignUpAsync(request);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost("refresh-token")]
         [Authorize]
-        [ValidateTokenExpires]
         public IActionResult RefreshToken()
         {
             throw new NotImplementedException("Not implemented yet");

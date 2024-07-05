@@ -1,6 +1,7 @@
 ﻿using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodRestaurantApp_BE.Services
 {
@@ -19,7 +20,7 @@ namespace FoodRestaurantApp_BE.Services
 
         public List<SystemUser> FindUsersByName(string username)
         {
-            return _userRepository.FindByName(username);
+            return _userRepository.FindByName(username).Include(x => x.Role).ToList();
         }
 
         public bool Update(SystemUser user)
@@ -33,7 +34,7 @@ namespace FoodRestaurantApp_BE.Services
         }
 
         List<SystemUser> IUserService.GetAll() {
-            return _userRepository.GetAll();
+            return _userRepository.GetAll().Include(x => x.Role).ToList();
         }
     }
 }

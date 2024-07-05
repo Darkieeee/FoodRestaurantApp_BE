@@ -18,7 +18,7 @@ namespace FoodRestaurantApp_BE.Repositories
             return role.FirstOrDefault();
         }
 
-        public List<Role> GetAll()
+        public IQueryable<Role> GetAll()
         {
             throw new NotImplementedException();
         }

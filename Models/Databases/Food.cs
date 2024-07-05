@@ -1,4 +1,6 @@
-﻿namespace FoodRestaurantApp_BE.Models.Databases
+﻿using System.Text.Json.Serialization;
+
+namespace FoodRestaurantApp_BE.Models.Databases
 {
     public class Food {
         public required int Id { get; set; }

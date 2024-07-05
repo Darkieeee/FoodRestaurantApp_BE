@@ -7,6 +7,14 @@ using System.Text;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using FoodRestaurantApp_BE.Repositories;
 using Microsoft.OpenApi.Models;
+using FoodRestaurantApp_BE.Middlewares;
+using FoodRestaurantApp_BE.Helpers;
+using FoodRestaurantApp_BE.Filters;
+using FluentValidation;
+using FoodRestaurantApp_BE.Models.DTOs;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
+using FoodRestaurantApp_BE.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add database to the container
@@ -36,11 +44,23 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 // *****************************
 
+// Add loggers to the container
+builder.Logging.AddFoodRestaurantFileLogger(options => {
+    builder.Configuration.GetSection("Logging")
+                         .GetSection("FoodRestaurantFile")
+                         .GetSection("Options")
+                         .Bind(options);
+});
+// *****************************
+
 // Add services to the container
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IOrderSystemService, OrderSystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
+builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();
+builder.Services.AddScoped<LoggingFilter>();
 // *****************************
 
 builder.Services.AddControllers();
@@ -72,7 +92,6 @@ builder.Services.AddSwaggerGen(c => {
     });
 });
 
-
 // Add Redis to the container
 builder.Services.AddStackExchangeRedisCache(options => {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
@@ -86,6 +105,15 @@ StackExchangeRedisCacheServiceCollectionExtensions.AddStackExchangeRedisCache(bu
 });
 */
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddHttpLogging(opt => { 
+    opt.LoggingFields = HttpLoggingFields.RequestPropertiesAndHeaders | HttpLoggingFields.RequestQuery 
+                      | HttpLoggingFields.RequestBody | HttpLoggingFields.ResponsePropertiesAndHeaders; 
+});
+
+builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -94,10 +122,14 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseExceptionHandler(opt => { });
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHttpLogging();
+
+app.UseTokenValidation();
 
 app.MapControllers();
 app.MapSwagger().RequireAuthorization();

@@ -1,37 +1,24 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using FluentValidation;
 
 namespace FoodRestaurantApp_BE.Models.DTOs
 {
-    public class SignUpDto : RequestModel
+    public class SignUpDto
     {
         public required string Username { get; set; }
         public required string FullName { get; set; }
         public required string Email { get; set; }
         public required string Password { get; set; }
+    }
 
-        public override void Validate()
+    public class SignUpValidator : AbstractValidator<SignUpDto>
+    {
+        public SignUpValidator()
         {
-            ErrorMessages.AddRange(ValidateInputs());
-        }
-
-        private IEnumerable<string> ValidateInputs() 
-        {
-            if(Username.IsNullOrEmpty())
-            {
-                yield return "Tên đăng nhập không được bỏ trống";
-            }
-            else if(FullName.IsNullOrEmpty())
-            {
-                yield return "Họ tên không được bỏ trống";
-            }
-            else if (Email.IsNullOrEmpty())
-            {
-                yield return "Email không được bỏ trống";
-            }
-            else if (Password.IsNullOrEmpty())
-            {
-                yield return "Mật khẩu không được bỏ trống";
-            }
+            RuleFor(x => x.Username).NotNull().NotEmpty().WithMessage("{PropertyName} không được bỏ trống");
+            RuleFor(x => x.Email).NotNull().NotEmpty().WithMessage("{PropertyName} không được bỏ trống")
+                                 .EmailAddress().WithMessage("{PropertyName} không hợp lệ");
+            RuleFor(x => x.FullName).NotNull().WithName("{PropertyName} không được bỏ trống");
+            RuleFor(x => x.Password).NotNull().NotEmpty().WithName("{PropertyName} không được bỏ trống");
         }
     }
 }

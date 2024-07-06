@@ -1,11 +1,10 @@
-﻿namespace FoodRestaurantApp_BE.Services.Abstracts
+﻿using FoodRestaurantApp_BE.Models.Databases;
+using FoodRestaurantApp_BE.Models.DTOs;
+
+namespace FoodRestaurantApp_BE.Services.Abstracts
 {
     public interface IFoodService
     {
-        void GetAll();
-        void GetById();
-        void Insert();
-        void Update();
-        void Delete();
+        Task<Food> AddAsync(CreateFoodRequest request);
     }
 }

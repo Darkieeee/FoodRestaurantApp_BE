@@ -13,8 +13,8 @@ using FoodRestaurantApp_BE.Filters;
 using FluentValidation;
 using FoodRestaurantApp_BE.Models.DTOs;
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using FoodRestaurantApp_BE.Extensions;
+using FoodRestaurantApp_BE.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add database to the container
@@ -42,6 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Add repositories to the container
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 // *****************************
 
 // Add loggers to the container
@@ -58,9 +59,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IOrderSystemService, OrderSystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
 builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();
 builder.Services.AddScoped<LoggingFilter>();
+// *****************************
+
+
+// Add automapper to the container
+builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 // *****************************
 
 builder.Services.AddControllers();

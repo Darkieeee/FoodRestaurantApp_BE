@@ -1,4 +1,5 @@
 ﻿using FoodRestaurantApp_BE.Models.Databases;
+using FoodRestaurantApp_BE.Models.DTOs;
 
 namespace FoodRestaurantApp_BE.Repositories
 {
@@ -6,6 +7,6 @@ namespace FoodRestaurantApp_BE.Repositories
     {
         IQueryable<SystemUser> FindById(int id);
         IQueryable<SystemUser> FindByName(string username);
-        IQueryable<SystemUser> FindByNameAndPassword(string username, string password);
+        IQueryable<SystemUser> FindByEmail(string email);
     }
 }

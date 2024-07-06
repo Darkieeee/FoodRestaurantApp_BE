@@ -11,9 +11,10 @@ using System.Text;
 namespace FoodRestaurantApp_BE.Services
 {
     public class AuthService(IUserService userService, IConfiguration configuration, 
-                             IDistributedCache cache) : IAuthService
+                             IRoleService roleService, IDistributedCache cache) : IAuthService
     {
         private readonly IUserService _userService = userService;
+        private readonly IRoleService _roleService = roleService;
         private readonly IConfiguration _configuration = configuration;
         private readonly IDistributedCache _cache = cache;
 
@@ -29,42 +30,34 @@ namespace FoodRestaurantApp_BE.Services
 
         public async Task<AuthDto> VerifyUserAsync(string username, string password)
         {
-            SystemUser? user = _userService.FindUsersByName(username).FirstOrDefault();
+            SystemUser? user = await _userService.Authenticate(username, password);
             AuthDto result = new();
 
-            if (user == null)
+            if (user != null)
             {
-                result.Success = false;
-                result.Code = AuthDto.WRONG_USERNAME;
-                result.Message = "Wrong username";
-            }
-            else
-            {
-                if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
+                if(!user.IsActive)
                 {
                     result.Success = false;
-                    result.Code = AuthDto.WRONG_PASSWORD;
-                    result.Message = "Wrong password";
+                    result.Message = "User is inactive. Please contact admin for more information";
                 }
+
                 else
                 {
                     string token = GenerateToken(user, _configuration["JwtBearer:SecretKey"]!);
 
-                    user.LastLogin = DateTime.Now;
-
                     result.Success = true;
-                    result.Code = AuthDto.IS_VALID;
                     result.Message = "Valid authentication";
                     result.UserId = user.Id;
                     result.UserName = user.Name;
                     result.RoleName = user.Role.Description;
                     result.IsAdmin = user.Role.Id != Constants.Roles.Customer;
                     result.Token = token;
-
-                    TimeSpan duration = TimeSpan.FromMinutes(15);
-
-                    await _userService.UpdateAsync(user);
                 }
+            }
+            else
+            {
+                result.Success = false;
+                result.Message = "Wrong username or password";
             }
 
             return result;
@@ -103,11 +96,18 @@ namespace FoodRestaurantApp_BE.Services
         {
             RegisterDto result = new();
 
-            if(_userService.FindUsersByName(request.Username).Count > 0)
+            if(_userService.CheckUsernameIfExists(request.Username))
             {
                 result.Success = false;
-                result.Code = 32;
                 result.Message = "Username has already existed";
+
+                return result;
+            }
+
+            if (_userService.CheckEmailIfExists(request.Username))
+            {
+                result.Success = false;
+                result.Message = "Email has already existed";
 
                 return result;
             }
@@ -127,11 +127,9 @@ namespace FoodRestaurantApp_BE.Services
             if(registered) {
                 result.Success = true;
                 result.Message = "Registration succeeded";
-                result.Code = 0;
             } else{
                 result.Success = false;
                 result.Message = "Registration failed";
-                result.Code = 33;
             }
             return result;
         }

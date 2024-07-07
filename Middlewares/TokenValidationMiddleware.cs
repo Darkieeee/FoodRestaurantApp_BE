@@ -31,7 +31,7 @@ namespace FoodRestaurantApp_BE.Middlewares
             bool rejected = await _tokenBlacklistService.IsTokenBlacklistAsync(token);
             if(rejected)
             {
-                throw new UnauthorizedAccessException("Token rejected");
+                throw new UnauthorizedAccessException("Invalid authorization token provided");
             }
             await _next(context);
         }

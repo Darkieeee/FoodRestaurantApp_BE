@@ -56,7 +56,7 @@ namespace FoodRestaurantApp_BE.Services
             return new UserDetailModelResponse()
             {
                 Email = user.Email,
-                Id = user.Id,
+                Uuid = user.Uuid,
                 Name = user.Name,
                 FullName = user.FullName,
                 Role = new RoleModelResponse()
@@ -72,7 +72,7 @@ namespace FoodRestaurantApp_BE.Services
             return new UserShortDetailModelResponse()
             {
                 Email = user.Email,
-                Id = user.Id,
+                Uuid = user.Uuid,
                 FullName = user.FullName,
                 Name = user.Name,
             };
@@ -113,14 +113,30 @@ namespace FoodRestaurantApp_BE.Services
                                                                                  .ToList();
 
             Pagination<UserDetailModelResponse> pagination;
-            pagination = PaginationBuilder<UserDetailModelResponse>.Create()
-                                                                   .WithCurrentPage(currentPage)
-                                                                   .WithPageSize(pageSizeOption)
-                                                                   .WithData(userDetailModelResponses, 
-                                                                             totalCount, 
-                                                                             totalPage)
-                                                                   .Build();
+            pagination = PaginationHelper.CreateBuilder<UserDetailModelResponse>()
+                                         .WithCurrentPage(currentPage)
+                                         .WithPageSize(pageSizeOption)
+                                         .WithData(userDetailModelResponses, totalCount, totalPage)
+                                         .Build();
             return pagination;
+        }
+
+        public UserDetailModelResponse? GetById(int id)
+        {
+            UserDetailModelResponse? user = _userRepository.FindById(id)
+                                                           .Include(x => x.Role)
+                                                           .Select(x => GetDetailInformation(x, x.Role))
+                                                           .FirstOrDefault();
+            return user;
+        }
+
+        public UserDetailModelResponse? GetByUuid(string uuid)
+        {
+            UserDetailModelResponse? user = _userRepository.FindByUuid(uuid)
+                                                           .Include(x => x.Role)
+                                                           .Select(x => GetDetailInformation(x, x.Role))
+                                                           .FirstOrDefault();
+            return user;
         }
     }
 }

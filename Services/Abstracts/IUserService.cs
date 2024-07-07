@@ -7,6 +7,9 @@ namespace FoodRestaurantApp_BE.Services.Abstracts
     {
         Pagination<UserDetailModelResponse> GetPagination(string? search, PageSizeOption sizeOption, int currentPage);
         List<UserShortDetailModelResponse> GetAll();
+        [Obsolete("The method is considered less secure for user data information. Use GetByUuid() instead")]
+        UserDetailModelResponse? GetById(int id);
+        UserDetailModelResponse? GetByUuid(string uuid);
         bool Create(SystemUser user);
         bool Update(SystemUser user);
         bool CheckUsernameIfExists(string username);

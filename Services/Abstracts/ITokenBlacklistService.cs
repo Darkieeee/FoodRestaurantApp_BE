@@ -2,6 +2,7 @@
 {
     public interface ITokenBlacklistService
     {
+        Task AddToken(string token);
         Task<bool> IsTokenBlacklistAsync(string token);
     }
 }

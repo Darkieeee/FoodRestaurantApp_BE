@@ -1,9 +1,9 @@
 namespace FoodRestaurantApp_BE.Constants
 {
-    internal static class Roles
+    public enum Roles
     {
-        public static readonly short Admin = 1;
-        public static readonly short Employee = 2;
-        public static readonly short Customer = 3;
+        ADMIN = 1,
+        NVIEN = 2,
+        KHHANG = 3
     }
 }

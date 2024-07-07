@@ -8,6 +8,11 @@ namespace FoodRestaurantApp_BE.Services
     {
         private readonly IDistributedCache _cache = cache;
 
+        public async Task AddToken(string token)
+        {
+            await _cache.SetRecordAsync(token, true);
+        }
+
         public async Task<bool> IsTokenBlacklistAsync(string token)
         {
             return await _cache.GetRecordAsync<bool>(token);

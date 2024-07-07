@@ -4,6 +4,7 @@ using FoodRestaurantApp_BE.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodRestaurantApp_BE.Migrations
 {
     [DbContext(typeof(FoodRestaurantDbContext))]
-    partial class FoodRestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240707164024_AddUserUuid")]
+    partial class AddUserUuid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -7,6 +7,7 @@ namespace FoodRestaurantApp_BE.Models.Databases {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public required string Uuid { get; set; }
         public required string Name { get; set; }
         public required string FullName { get; set; }
         public required string Email { get; set; }
@@ -18,5 +19,6 @@ namespace FoodRestaurantApp_BE.Models.Databases {
         public virtual Role Role { get; set; } = null!;
         public DateTime? LastLogin { get; set; }
         public ICollection<SystemOrder> SystemOrders { get; set; } = new List<SystemOrder>();
+        public string? Avatar { get; set; }
     }
 }

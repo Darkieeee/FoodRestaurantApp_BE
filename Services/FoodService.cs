@@ -1,29 +1,21 @@
 ﻿using FoodRestaurantApp_BE.Models.Databases;
-using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
-using Slugify;
 
 namespace FoodRestaurantApp_BE.Services
 {
     public class FoodService(IFoodRepository foodRepository) : IFoodService
     {
         private readonly IFoodRepository _foodRepository = foodRepository;
-       
-        public async Task<Food> AddAsync(CreateFoodRequest request)
+
+        public bool Create(Food f)
         {
-            SlugHelper slugHelper = new();
-            Food food = new()
-            {
-                Id = 0,
-                Name = request.Name,
-                Description = request.Description,
-                Price = request.Price,
-                TypeId = request.FoodType,
-                Slug = slugHelper.GenerateSlug(request.Name),
-            };
-            await _foodRepository.InsertAsync(food);
-            return food;
+            return CreateAsync(f).Result;
+        }
+
+        public async Task<bool> CreateAsync(Food f)
+        {
+            return await _foodRepository.InsertAsync(f) > 0;
         }
     }
 }

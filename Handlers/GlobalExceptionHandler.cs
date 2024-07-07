@@ -1,6 +1,6 @@
-﻿using FoodRestaurantApp_BE.Models.DTOs;
+﻿using FoodRestaurantApp_BE.Exceptions;
+using FoodRestaurantApp_BE.Models.DTOs;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Data.SqlClient;
 using System.Net;
 
 namespace FoodRestaurantApp_BE.Middlewares
@@ -21,22 +21,28 @@ namespace FoodRestaurantApp_BE.Middlewares
                     title = "Authentication error";
                     message = exception.Message;
                     break;
-                case SqlException:
-                    statusCode = (int) System.Net.HttpStatusCode.InternalServerError;
-                    title = "Database error";
-                    message = "A database error occured! View log file to see how the exception was caught";
+                case ArgumentException:
+                    statusCode = (int) System.Net.HttpStatusCode.BadRequest;
+                    title = "Invalid argument";
+                    message = exception.Message;
+                    break;
+                case NotFoundException:
+                    statusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                    title = "No data available";
+                    message = exception.Message;
                     break;
                 default:
                     statusCode = (int) System.Net.HttpStatusCode.InternalServerError;
                     title = "Internal server error";
-                    message = exception.Message;
+                    message = exception.Message + "\r\n" + exception.InnerException;
                     break;
             }
 
             ErrorDto error = new()
             {
                 Title = title,
-                Messages = [message]
+                Messages = [message],
+                ErrorType = exception.GetType().Name,
             };
 
             httpContext.Response.ContentType = "application/json";

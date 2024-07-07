@@ -89,4 +89,13 @@
             };
         }
     }
+
+    public static class PaginationHelper
+    {
+        public static PaginationBuilder<T> CreateBuilder<T>()
+        {
+            PaginationBuilder<T> builder = PaginationBuilder<T>.Create();
+            return builder;
+        }
+    }
 }

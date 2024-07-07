@@ -17,13 +17,14 @@ using FoodRestaurantApp_BE.Extensions;
 using FoodRestaurantApp_BE.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
-// Add database to the container
+
+#region Add database to the container
 builder.Services.AddDbContext<FoodRestaurantDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("FoodRestaurantContext"))
 );
-// *****************************
+#endregion
 
-// Add Jwt Security to the container
+#region Add Jwt Security to the container 
 var secretKey = builder.Configuration["JwtBearer:SecretKey"];
 var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey!);
 
@@ -37,39 +38,43 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes)
                     };
                 });
-// *****************************
+#endregion
 
-// Add repositories to the container
+#region Add repositories to the container
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
-// *****************************
+builder.Services.AddScoped<IFoodTypeRepository, FoodTypeRepository>();
+#endregion
 
-// Add loggers to the container
+#region Add loggers to the container
 builder.Logging.AddFoodRestaurantFileLogger(options => {
     builder.Configuration.GetSection("Logging")
                          .GetSection("FoodRestaurantFile")
                          .GetSection("Options")
                          .Bind(options);
 });
-// *****************************
+#endregion
 
-// Add services to the container
+#region Add services to the container
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IOrderSystemService, OrderSystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
+builder.Services.AddScoped<IFoodTypeService, FoodTypeService>();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
+builder.Services.AddScoped<IValidator<CreateFoodTypeRequest>, CreateFoodTypeValidator>();
 builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();
 builder.Services.AddScoped<LoggingFilter>();
-// *****************************
+#endregion
 
-
-// Add automapper to the container
+#region Add automapper to the container
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
-// *****************************
+#endregion
 
+#region Add swagger
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -98,8 +103,9 @@ builder.Services.AddSwaggerGen(c => {
         }
     });
 });
+#endregion
 
-// Add Redis to the container
+#region Add Redis to the container
 builder.Services.AddStackExchangeRedisCache(options => {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
     options.InstanceName = "FoodRestaurantRedis_";
@@ -111,13 +117,18 @@ StackExchangeRedisCacheServiceCollectionExtensions.AddStackExchangeRedisCache(bu
     options.InstanceName = "FoodRestaurantRedis_";
 });
 */
+#endregion
 
+#region Add exception handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+#endregion
 
+#region Add logging
 builder.Services.AddHttpLogging(opt => { 
     opt.LoggingFields = HttpLoggingFields.RequestPropertiesAndHeaders | HttpLoggingFields.RequestQuery 
                       | HttpLoggingFields.RequestBody | HttpLoggingFields.ResponsePropertiesAndHeaders; 
 });
+#endregion
 
 builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
 

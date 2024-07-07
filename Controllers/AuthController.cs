@@ -2,7 +2,6 @@
 using FoodRestaurantApp_BE.Filters;
 using FoodRestaurantApp_BE.Helpers;
 using FoodRestaurantApp_BE.Models.DTOs;
-using FoodRestaurantApp_BE.Models.Requests;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ namespace FoodRestaurantApp_BE.Controllers
         public async Task<IActionResult> Login([FromBody] SignInRequest request)
         {
             
-            AuthDto result = await _authService.VerifyUserAsync(request.Username, request.Password);
+            AuthResponse result = await _authService.VerifyUserAsync(request.Username, request.Password);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
@@ -49,9 +48,9 @@ namespace FoodRestaurantApp_BE.Controllers
 
             if(!validated.IsValid)
             {
-                ErrorDto errorResponse = new()
+                StatusResponse errorResponse = new()
                 {
-                   Title = "Input validation failed",
+                   Success = false,
                    Messages = validated.Errors.Select(x => x.ErrorMessage).ToList()
                 };
                 return BadRequest(errorResponse);

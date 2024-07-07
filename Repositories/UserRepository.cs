@@ -16,6 +16,11 @@ namespace FoodRestaurantApp_BE.Repositories {
             return _dbContext.Users.Where(x => x.Id.Equals(id));
         }
 
+        public IQueryable<SystemUser> FindByUuid(string uuid)
+        {
+            return _dbContext.Users.Where(x => x.Uuid.Equals(uuid));
+        }
+
         public IQueryable<SystemUser> FindByEmail(string email)
         {
             IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Email.Equals(email));

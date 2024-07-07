@@ -1,8 +1,6 @@
-﻿using FoodRestaurantApp_BE.Helpers;
-using FoodRestaurantApp_BE.Models.Databases;
+﻿using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Services.Abstracts;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,14 +9,14 @@ using System.Text;
 namespace FoodRestaurantApp_BE.Services
 {
     public class AuthService(IUserService userService, IConfiguration configuration, 
-                             IRoleService roleService, IDistributedCache cache) : IAuthService
+                             IRoleService roleService, ITokenBlacklistService tokenBlacklistService) : IAuthService
     {
         private readonly IUserService _userService = userService;
         private readonly IRoleService _roleService = roleService;
         private readonly IConfiguration _configuration = configuration;
-        private readonly IDistributedCache _cache = cache;
+        private readonly ITokenBlacklistService _tokenBlacklstService = tokenBlacklistService;
 
-        public AuthDto VerifyUser(string username, string password)
+        public AuthResponse VerifyUser(string username, string password)
         {
             return VerifyUserAsync(username, password).Result;
         }
@@ -28,10 +26,10 @@ namespace FoodRestaurantApp_BE.Services
             return LogoutAsync(token).Result;
         }
 
-        public async Task<AuthDto> VerifyUserAsync(string username, string password)
+        public async Task<AuthResponse> VerifyUserAsync(string username, string password)
         {
             SystemUser? user = await _userService.Authenticate(username, password);
-            AuthDto result = new();
+            AuthResponse result = new();
 
             if (user != null)
             {
@@ -50,7 +48,7 @@ namespace FoodRestaurantApp_BE.Services
                     result.UserId = user.Id;
                     result.UserName = user.Name;
                     result.RoleName = user.Role.Description;
-                    result.IsAdmin = user.Role.Id != Constants.Roles.Customer;
+                    result.IsAdmin = user.Role.Name != nameof(Constants.Roles.KHHANG);
                     result.Token = token;
                 }
             }
@@ -116,9 +114,10 @@ namespace FoodRestaurantApp_BE.Services
             {
                 Name = request.Username,
                 Email = request.Email,
+                Uuid = Guid.NewGuid().ToString(),
                 Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 FullName = request.FullName,
-                RoleId = Constants.Roles.Customer,
+                RoleId = (int) Constants.Roles.KHHANG,
                 IsActive = true,
             };
 
@@ -138,7 +137,7 @@ namespace FoodRestaurantApp_BE.Services
         {
             LogoutDto logoutResult = new();
 
-            await _cache.SetRecordAsync(tokenId, true);
+            await _tokenBlacklstService.AddToken(tokenId);
 
             logoutResult.Success = true;
             logoutResult.Message = "Logout succeeded";

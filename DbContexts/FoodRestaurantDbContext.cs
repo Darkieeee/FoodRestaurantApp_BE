@@ -90,7 +90,9 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.RoleId).HasColumnName("role_id").IsRequired().HasMaxLength(10);
                 e.Property(x => x.CreatedDate).HasColumnName("created_date").HasDefaultValue(DateTime.Now);
                 e.Property(x => x.IsActive).HasColumnName("is_active").IsRequired().HasDefaultValue(true);
-                e.Property(x => x.LastLogin).HasColumnName("last_login");   
+                e.Property(x => x.LastLogin).HasColumnName("last_login");
+                e.Property(x => x.Uuid).HasColumnName("uuid").IsRequired();
+                e.Property(x => x.Avatar).HasColumnName("avatar").IsRequired(false);
             });
 
             modelBuilder.Entity<SystemUser>().HasIndex(e => e.Name).IsUnique();
@@ -192,9 +194,9 @@ namespace FoodRestaurantApp_BE.DbContexts {
 
             // Seeding data
             modelBuilder.Entity<Role>().HasData([
-                new Role(Constants.Roles.Admin, "ADMIN", "Quản trị hệ thống"),
-                new Role(Constants.Roles.Employee, "NVIEN", "Nhân viên"),
-                new Role(Constants.Roles.Customer, "KHHANG", "Khách hàng mua sắm"),
+                new Role((int) Constants.Roles.ADMIN, "ADMIN", "Quản trị hệ thống"),
+                new Role((int) Constants.Roles.NVIEN, "NVIEN", "Nhân viên"),
+                new Role((int) Constants.Roles.KHHANG, "KHHANG", "Khách hàng mua sắm"),
             ]);
 
             modelBuilder.Entity<SystemUser>().HasData([
@@ -202,12 +204,13 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 {
                     Id = 1,
                     Name = "admin",
+                    Uuid = Guid.NewGuid().ToString(),
                     FullName = "Quản trị hệ thống",
                     Email = "admin@gmail.com",
                     Password = BCrypt.Net.BCrypt.HashPassword("123456"),
                     CreatedDate = DateTime.Now,
                     IsActive = true,
-                    RoleId = Constants.Roles.Admin
+                    RoleId = (int) Constants.Roles.ADMIN
                 }
             ]);
         }

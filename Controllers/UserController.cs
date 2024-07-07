@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using FoodRestaurantApp_BE.Constants;
+using FoodRestaurantApp_BE.Exceptions;
 using FoodRestaurantApp_BE.Filters;
 using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
-using FoodRestaurantApp_BE.Models.Requests;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace FoodRestaurantApp_BE.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    [ValidToken]
+    [ValidToken(AllowedRoles = [nameof(Roles.ADMIN)])]
     [ApiController]
     public class UserController(IUserService userService, IMapper mapper) : ControllerBase
     {
@@ -19,10 +20,10 @@ namespace FoodRestaurantApp_BE.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpPost("create")]
-        public IActionResult CreateUser([FromBody] CreateUserRequest request)
+        public async Task<ActionResult> CreateUser([FromForm] CreateUserRequest request)
         {
             SystemUser user = _mapper.Map<SystemUser>(request);
-            bool created = _userService.Create(user);
+            bool created = await _userService.CreateAsync(user);
             StatusResponse response = new()
             {
                 Success = created
@@ -30,13 +31,28 @@ namespace FoodRestaurantApp_BE.Controllers
 
             if (response.Success)
             {
-                response.Message.Add("Thêm mới người dùng thành công");
+                response.Messages.Add("Add new user successfully");
                 return Ok(response);
             }
             else
             {
-                response.Message.Add("Thêm mới người dùng thất bại");
+                response.Messages.Add("Add new user unsuccessfully");
                 return BadRequest(response);
+            }
+        }
+
+        [HttpGet("uuid/{uuid}")]
+        public IActionResult GetByUuid(string uuid)
+        {
+            UserDetailModelResponse? userDetail = _userService.GetByUuid(uuid);
+            
+            if(userDetail != null)
+            {
+                return Ok(userDetail);
+            }
+            else 
+            {
+                throw new NotFoundException($"Not found user with uuid {uuid}", null);
             }
         }
 
@@ -49,7 +65,7 @@ namespace FoodRestaurantApp_BE.Controllers
         [HttpGet("get-list")]
         public IActionResult GetList()
         {
-            return Ok(); 
+            return Ok(_userService.GetAll()); 
         }
     }
 }

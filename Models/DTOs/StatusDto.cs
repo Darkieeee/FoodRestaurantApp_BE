@@ -3,6 +3,6 @@
     public class StatusResponse
     {
         public bool Success { get; set; }
-        public List<string> Message { get; set; } = [];
+        public List<string> Messages { get; set; } = [];
     }
 }

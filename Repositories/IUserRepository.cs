@@ -8,5 +8,6 @@ namespace FoodRestaurantApp_BE.Repositories
         IQueryable<SystemUser> FindByUuid(string uuid);
         IQueryable<SystemUser> FindByName(string username);
         IQueryable<SystemUser> FindByEmail(string email);
+        IQueryable<SystemUser> FindByNameAndIsAdmin(string username, bool isAdmin);
     }
 }

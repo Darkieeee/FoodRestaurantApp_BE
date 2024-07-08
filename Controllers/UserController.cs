@@ -16,11 +16,11 @@ namespace FoodRestaurantApp_BE.Controllers
     [Authorize]
     [ValidToken(AllowedRoles = [nameof(Roles.ADMIN)])]
     [ApiController]
-    public class UserController(IUserService userService, IServiceProvider serviceProvider, 
+    public class UserController(IUserService userService, IFileService fileService, 
                                 IMapper mapper, ILogger<UserController> logger) : ControllerBase {
         private readonly IUserService _userService = userService;
         private readonly IMapper _mapper = mapper;
-        private readonly ImageFileService _imageFileService = serviceProvider.GetRequiredService<ImageFileService>();
+        private readonly IFileService _fileService = (ImageFileService) fileService;
         private readonly ILogger<UserController> _logger = logger;
 
         [HttpPost("create")]
@@ -32,8 +32,8 @@ namespace FoodRestaurantApp_BE.Controllers
             {
                 string mainDirectory = Environment.CurrentDirectory;
                 string subDirectory = Path.Combine("Images", "Avatar");
-                string fileUploadedUri = await _imageFileService.UploadFile(Path.Combine(mainDirectory, subDirectory), 
-                                                                            request.Avatar);
+                string fileUploadedUri = await _fileService.UploadFile(Path.Combine(mainDirectory, subDirectory), 
+                                                                       request.Avatar);
                 user.Avatar = fileUploadedUri;
             }
 
@@ -44,9 +44,9 @@ namespace FoodRestaurantApp_BE.Controllers
             }
             catch(SqlException)
             {
-                if (user.Avatar != null && _imageFileService.CheckFileIfExists(user.Avatar))
+                if (user.Avatar != null && _fileService.CheckFileIfExists(user.Avatar))
                 {
-                    _imageFileService.DeleteFile(user.Avatar);
+                    _fileService.DeleteFile(user.Avatar);
                 }
                 throw;
             }

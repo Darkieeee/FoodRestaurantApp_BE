@@ -64,7 +64,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<IFoodTypeService, FoodTypeService>();
 builder.Services.AddScoped<IFileService, FileService>();
-builder.Services.AddScoped<FileService, ImageFileService>();
+builder.Services.AddScoped<IFileService, ImageFileService>();
 builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
 builder.Services.AddScoped<IValidator<CreateFoodTypeRequest>, CreateFoodTypeValidator>();
 builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();

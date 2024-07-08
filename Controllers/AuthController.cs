@@ -15,16 +15,28 @@ namespace FoodRestaurantApp_BE.Controllers
         private readonly IAuthService _authService = authService;
 
         /// <summary>
-        /// Xác thực và cấp phát token cho người dùng
+        /// Xác thực và cấp phát token cho khách hàng
         /// </summary>
         /// <param name="request">Yêu cầu đăng nhập</param>
         /// <returns></returns>
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] SignInRequest request)
+        {    
+            AuthResponse result = await _authService.VerifyUserAsync(request.Username, request.Password, false);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        /// <summary>
+        /// Xác thực và cấp phát token cho quản trị
+        /// </summary>
+        /// <param name="request">Yêu cầu đăng nhập</param>
+        /// <returns></returns>
+        [HttpPost("admin/login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginAsAdmin([FromBody] SignInRequest request)
         {
-            
-            AuthResponse result = await _authService.VerifyUserAsync(request.Username, request.Password);
+            AuthResponse result = await _authService.VerifyUserAsync(request.Username, request.Password, true);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 

@@ -44,8 +44,10 @@ namespace FoodRestaurantApp_BE.Services
                 Directory.CreateDirectory(directory);
             }
 
-            string newFileName = string.Format("{0}_{1}", file.FileName, DateTime.Now.ToString("ddMMyyyyHHmmss"));
-            string path = Path.Combine(directory, file.FileName + newFileName);
+            string newFileName = string.Format("{0}_{1}{2}", Path.GetFileNameWithoutExtension(file.FileName) ?? "", 
+                                                             DateTime.Now.ToString("ddMMyyyyHHmmss"), 
+                                                             Path.GetExtension(file.FileName) ?? "");
+            string path = Path.Combine(directory, newFileName);
             using Stream stream = File.Create(path);
             await file.CopyToAsync(stream);
 

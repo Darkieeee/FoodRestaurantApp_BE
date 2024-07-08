@@ -14,7 +14,7 @@ namespace FoodRestaurantApp_BE.Services.Abstracts
         DbDMLStatementResult Update(SystemUser user);
         bool CheckUsernameIfExists(string username);
         bool CheckEmailIfExists(string email);
-        Task<UserDetailModelResponse?> Authenticate(string username, string password);
+        Task<UserDetailModelResponse?> Authenticate(string username, string password, bool isAdmin);
         Task<DbDMLStatementResult> UpdateAsync(SystemUser user);
         Task<DbDMLStatementResult> CreateAsync(SystemUser user);
     }

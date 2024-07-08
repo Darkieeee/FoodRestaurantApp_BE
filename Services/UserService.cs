@@ -97,9 +97,9 @@ namespace FoodRestaurantApp_BE.Services
             return _userRepository.GetAll().Select(x => GetShortInformation(x)).ToList();
         }
 
-        public async Task<UserDetailModelResponse?> Authenticate(string username, string password)
+        public async Task<UserDetailModelResponse?> Authenticate(string username, string password, bool isAdmin)
         {
-            SystemUser? user = _userRepository.FindByName(username)
+            SystemUser? user = _userRepository.FindByNameAndIsAdmin(username, isAdmin)
                                               .Include(x => x.Role)
                                               .FirstOrDefault();
             if(user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))

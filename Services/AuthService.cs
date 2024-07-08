@@ -16,9 +16,9 @@ namespace FoodRestaurantApp_BE.Services
         private readonly IConfiguration _configuration = configuration;
         private readonly ITokenBlacklistService _tokenBlacklstService = tokenBlacklistService;
 
-        public AuthResponse VerifyUser(string username, string password)
+        public AuthResponse VerifyUser(string username, string password, bool isAdmin)
         {
-            return VerifyUserAsync(username, password).Result;
+            return VerifyUserAsync(username, password, isAdmin).Result;
         }
         
         public LogoutDto Logout(string token)
@@ -26,9 +26,9 @@ namespace FoodRestaurantApp_BE.Services
             return LogoutAsync(token).Result;
         }
 
-        public async Task<AuthResponse> VerifyUserAsync(string username, string password)
+        public async Task<AuthResponse> VerifyUserAsync(string username, string password, bool isAdmin)
         {
-            UserDetailModelResponse? user = await _userService.Authenticate(username, password);
+            UserDetailModelResponse? user = await _userService.Authenticate(username, password, isAdmin);
             AuthResponse result = new();
 
             if (user != null)
@@ -38,7 +38,6 @@ namespace FoodRestaurantApp_BE.Services
                     result.Success = false;
                     result.Message = "User is inactive. Please contact admin for more information";
                 }
-
                 else
                 {
                     string token = GenerateToken(user, _configuration["JwtBearer:SecretKey"]!);
@@ -101,6 +100,7 @@ namespace FoodRestaurantApp_BE.Services
                 FullName = request.FullName,
                 RoleId = (int) Constants.Roles.KHHANG,
                 IsActive = true,
+                IsAdmin = false
             };
 
             DbDMLStatementResult statementResult = await _userService.CreateAsync(user);

@@ -2,13 +2,11 @@
 {
     public class ImageFileService : FileService
     {
-        private readonly List<string> ImageExtensions = [
-            ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG"
-        ];
+        private readonly List<string> ImageExtensions = ["image/png", "image/jpeg", "image/gif", "image/pjpeg"];
 
         public override bool IsFileSupported(IFormFile file)
         {
-            return !ImageExtensions.Contains(file.ContentType);
+            return ImageExtensions.Contains(file.ContentType);
         }
     }
 }

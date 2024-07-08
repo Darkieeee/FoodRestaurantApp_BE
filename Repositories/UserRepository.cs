@@ -26,5 +26,12 @@ namespace FoodRestaurantApp_BE.Repositories {
             IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Email.Equals(email));
             return users;
         }
+
+        public IQueryable<SystemUser> FindByNameAndIsAdmin(string name, bool isAdmin)
+        {
+            IQueryable<SystemUser> users = _dbContext.Users.Where(x => x.Name.Equals(name) 
+                                                                    && x.IsAdmin.Equals(isAdmin));
+            return users;
+        }
     }
 }

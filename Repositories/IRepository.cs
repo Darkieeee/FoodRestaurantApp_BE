@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Data.Common;
 
 namespace FoodRestaurantApp_BE.Repositories
 {
@@ -14,5 +14,8 @@ namespace FoodRestaurantApp_BE.Repositories
         Task<int> InsertRangeAsync(IEnumerable<T> t);
         Task<int> UpdateRangeAsync(IEnumerable<T> t);
         Task<int> DeleteRangeAsync(IEnumerable<T> t);
+        void BeginTransaction();
+        void Commit();
+        void Rollback();
     }
 }

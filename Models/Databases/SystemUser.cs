@@ -15,6 +15,7 @@ namespace FoodRestaurantApp_BE.Models.Databases {
         public required string Password { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsActive { get; set; }
+        public bool IsAdmin { get; set; }
         public int RoleId { get; set; }
         public virtual Role Role { get; set; } = null!;
         public DateTime? LastLogin { get; set; }

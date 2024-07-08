@@ -21,14 +21,14 @@ namespace FoodRestaurantApp_BE.Middlewares
                     title = "Authentication error";
                     message = exception.Message;
                     break;
-                case ArgumentException:
+                case NotFoundException:
                     statusCode = (int) System.Net.HttpStatusCode.BadRequest;
-                    title = "Invalid argument";
+                    title = "No data available";
                     message = exception.Message;
                     break;
-                case NotFoundException:
-                    statusCode = (int)System.Net.HttpStatusCode.BadRequest;
-                    title = "No data available";
+                case NotSupportedException:
+                    statusCode = (int) System.Net.HttpStatusCode.BadRequest;
+                    title = "Not supported";
                     message = exception.Message;
                     break;
                 default:

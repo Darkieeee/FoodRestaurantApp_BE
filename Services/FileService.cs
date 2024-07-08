@@ -4,7 +4,20 @@ namespace FoodRestaurantApp_BE.Services
 {
     public class FileService : IFileService
     {
-        public void Download(string filepath)
+        public bool CheckFileIfExists(string filepath)
+        {
+            return File.Exists(filepath);
+        }
+
+        public void DeleteFile(string filepath)
+        {
+            if(CheckFileIfExists(filepath))
+            {
+                File.Delete(filepath);
+            }
+        }
+
+        public void DownloadFile(string filepath)
         {
             throw new NotImplementedException();
         }
@@ -14,7 +27,32 @@ namespace FoodRestaurantApp_BE.Services
             throw new NotImplementedException();
         }
 
-        public void Upload(string filepath)
+        public virtual bool IsFileSupported(IFormFile file)
+        {
+            return true;
+        }
+
+        public async Task<string> UploadFile(string directory, IFormFile file)
+        {
+            if(!IsFileSupported(file))
+            {
+                throw new NotSupportedException($"File with extension {file.ContentType} is not supported");
+            }
+
+            if(!Directory.Exists(directory)) 
+            { 
+                Directory.CreateDirectory(directory);
+            }
+
+            string newFileName = string.Format("{0}_{1}", file.FileName, DateTime.Now.ToString("ddMMyyyyHHmmss"));
+            string path = Path.Combine(directory, file.FileName + newFileName);
+            using Stream stream = File.Create(path);
+            await file.CopyToAsync(stream);
+
+            return path;
+        }
+
+        public void UploadFiles(string directory, IEnumerable<IFormFile> file)
         {
             throw new NotImplementedException();
         }

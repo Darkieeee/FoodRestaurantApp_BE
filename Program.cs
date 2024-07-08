@@ -64,6 +64,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<IFoodTypeService, FoodTypeService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<FileService, ImageFileService>();
 builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
 builder.Services.AddScoped<IValidator<CreateFoodTypeRequest>, CreateFoodTypeValidator>();
 builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();
@@ -123,7 +124,7 @@ StackExchangeRedisCacheServiceCollectionExtensions.AddStackExchangeRedisCache(bu
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 #endregion
 
-#region Add logging
+#region Add http logging
 builder.Services.AddHttpLogging(opt => { 
     opt.LoggingFields = HttpLoggingFields.RequestPropertiesAndHeaders | HttpLoggingFields.RequestQuery 
                       | HttpLoggingFields.RequestBody | HttpLoggingFields.ResponsePropertiesAndHeaders; 

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FoodRestaurantApp_BE.Migrations
 {
     /// <inheritdoc />
-    public partial class InitTables : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -46,7 +46,8 @@ namespace FoodRestaurantApp_BE.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    editable = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
                 },
                 constraints: table =>
                 {
@@ -121,14 +122,17 @@ namespace FoodRestaurantApp_BE.Migrations
                 {
                     uid = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    uuid = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     full_name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 5, 15, 14, 45, 47, 349, DateTimeKind.Local).AddTicks(9516)),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 8, 18, 3, 11, 248, DateTimeKind.Local).AddTicks(7923)),
                     is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    is_admin = table.Column<bool>(type: "bit", nullable: false),
                     role_id = table.Column<int>(type: "int", maxLength: 10, nullable: false),
-                    last_login = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    last_login = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    avatar = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -210,13 +214,13 @@ namespace FoodRestaurantApp_BE.Migrations
                 {
                     { 1, "Quản trị hệ thống", "ADMIN" },
                     { 2, "Nhân viên", "NVIEN" },
-                    { 3, "Khách hàng mua sắm", "KHHANG" }
+                    { 3, "Khách hàng mua sắm", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "uid", "created_date", "email", "full_name", "is_active", "last_login", "name", "password", "role_id" },
-                values: new object[] { 1, new DateTime(2024, 5, 15, 14, 45, 47, 524, DateTimeKind.Local).AddTicks(5613), "admin@gmail.com", "Quản trị hệ thống", true, null, "admin", "$2a$11$g9FCoWk0uYvBqwChw3QuZehUx2Cxn6HdZYmqti7/TsUhjRr.HxMT.", 1 });
+                columns: new[] { "uid", "avatar", "created_date", "email", "full_name", "is_active", "is_admin", "last_login", "name", "password", "role_id", "uuid" },
+                values: new object[] { 1, null, new DateTime(2024, 7, 8, 18, 3, 11, 439, DateTimeKind.Local).AddTicks(6732), "admin@gmail.com", "Quản trị hệ thống", true, true, null, "admin", "$2a$11$1XbctSqrLxhhFXj9RFfkHOAvAeIgIo.2lIwAW4b3tqUqg.MS98yLy", 1, "3e1e1155-3617-4b7b-9044-a79ff6bce168" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Foods_food_type",
@@ -242,6 +246,18 @@ namespace FoodRestaurantApp_BE.Migrations
                 name: "IX_SystemOrders_placed_by",
                 table: "SystemOrders",
                 column: "placed_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_email",
+                table: "Users",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_name",
+                table: "Users",
+                column: "name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_role_id",

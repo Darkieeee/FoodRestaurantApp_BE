@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodRestaurantApp_BE.Migrations
 {
     [DbContext(typeof(FoodRestaurantDbContext))]
-    [Migration("20240515074547_InitTables")]
-    partial class InitTables
+    [Migration("20240708110311_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -132,6 +132,12 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("description");
 
+                    b.Property<bool>("Editable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("editable");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -147,19 +153,22 @@ namespace FoodRestaurantApp_BE.Migrations
                         {
                             Id = 1,
                             Description = "Quản trị hệ thống",
+                            Editable = false,
                             Name = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
                             Description = "Nhân viên",
+                            Editable = false,
                             Name = "NVIEN"
                         },
                         new
                         {
                             Id = 3,
                             Description = "Khách hàng mua sắm",
-                            Name = "KHHANG"
+                            Editable = false,
+                            Name = "ADMIN"
                         });
                 });
 
@@ -298,10 +307,14 @@ namespace FoodRestaurantApp_BE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("avatar");
+
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 15, 14, 45, 47, 349, DateTimeKind.Local).AddTicks(9516))
+                        .HasDefaultValue(new DateTime(2024, 7, 8, 18, 3, 11, 248, DateTimeKind.Local).AddTicks(7923))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -321,6 +334,10 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_admin");
 
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime2")
@@ -343,7 +360,18 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnType("int")
                         .HasColumnName("role_id");
 
+                    b.Property<string>("Uuid")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("RoleId");
 
@@ -353,13 +381,15 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 5, 15, 14, 45, 47, 524, DateTimeKind.Local).AddTicks(5613),
+                            CreatedDate = new DateTime(2024, 7, 8, 18, 3, 11, 439, DateTimeKind.Local).AddTicks(6732),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
+                            IsAdmin = true,
                             Name = "admin",
-                            Password = "$2a$11$g9FCoWk0uYvBqwChw3QuZehUx2Cxn6HdZYmqti7/TsUhjRr.HxMT.",
-                            RoleId = 1
+                            Password = "$2a$11$1XbctSqrLxhhFXj9RFfkHOAvAeIgIo.2lIwAW4b3tqUqg.MS98yLy",
+                            RoleId = 1,
+                            Uuid = "3e1e1155-3617-4b7b-9044-a79ff6bce168"
                         });
                 });
 

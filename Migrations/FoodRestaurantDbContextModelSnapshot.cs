@@ -129,6 +129,12 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("description");
 
+                    b.Property<bool>("Editable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("editable");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -144,19 +150,22 @@ namespace FoodRestaurantApp_BE.Migrations
                         {
                             Id = 1,
                             Description = "Quản trị hệ thống",
+                            Editable = false,
                             Name = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
                             Description = "Nhân viên",
+                            Editable = false,
                             Name = "NVIEN"
                         },
                         new
                         {
                             Id = 3,
                             Description = "Khách hàng mua sắm",
-                            Name = "KHHANG"
+                            Editable = false,
+                            Name = "ADMIN"
                         });
                 });
 
@@ -302,7 +311,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 7, 23, 40, 23, 333, DateTimeKind.Local).AddTicks(2036))
+                        .HasDefaultValue(new DateTime(2024, 7, 8, 18, 3, 11, 248, DateTimeKind.Local).AddTicks(7923))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -322,6 +331,10 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_admin");
 
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime2")
@@ -365,14 +378,15 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 7, 7, 23, 40, 23, 611, DateTimeKind.Local).AddTicks(3385),
+                            CreatedDate = new DateTime(2024, 7, 8, 18, 3, 11, 439, DateTimeKind.Local).AddTicks(6732),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
+                            IsAdmin = true,
                             Name = "admin",
-                            Password = "$2a$11$xcu1db8ssAUAH3xJ5H0z0OCzj1k8jNwE3sVOzT048j/fMgyqY9sLO",
+                            Password = "$2a$11$1XbctSqrLxhhFXj9RFfkHOAvAeIgIo.2lIwAW4b3tqUqg.MS98yLy",
                             RoleId = 1,
-                            Uuid = "25445b0c-f8fb-4fac-a807-71522a252f7b"
+                            Uuid = "3e1e1155-3617-4b7b-9044-a79ff6bce168"
                         });
                 });
 

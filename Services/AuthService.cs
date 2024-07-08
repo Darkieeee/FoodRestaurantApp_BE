@@ -28,7 +28,7 @@ namespace FoodRestaurantApp_BE.Services
 
         public async Task<AuthResponse> VerifyUserAsync(string username, string password)
         {
-            SystemUser? user = await _userService.Authenticate(username, password);
+            UserDetailModelResponse? user = await _userService.Authenticate(username, password);
             AuthResponse result = new();
 
             if (user != null)
@@ -45,10 +45,8 @@ namespace FoodRestaurantApp_BE.Services
 
                     result.Success = true;
                     result.Message = "Valid authentication";
-                    result.UserId = user.Id;
                     result.UserName = user.Name;
-                    result.RoleName = user.Role.Description;
-                    result.IsAdmin = user.Role.Name != nameof(Constants.Roles.KHHANG);
+                    result.RoleName = user.Role?.RoleName ?? "";
                     result.Token = token;
                 }
             }
@@ -61,14 +59,14 @@ namespace FoodRestaurantApp_BE.Services
             return result;
         }
 
-        private string GenerateToken(SystemUser user, string secretKey, int expiredMinutes = 10)
+        private string GenerateToken(UserDetailModelResponse user, string secretKey, int expiredMinutes = 10)
         {
             JwtSecurityTokenHandler _webTokenHandler = new();
 
             List<Claim> claims = [
-                new("uid", user.Id.ToString()),
+                new("uid", user.Uuid),
                 new(ClaimTypes.Name, user.Name),
-                new(ClaimTypes.Role, user.Role.Name),
+                new(ClaimTypes.Role, user.Role?.RoleName ?? ""),
             ];
 
             byte[] secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
@@ -94,22 +92,6 @@ namespace FoodRestaurantApp_BE.Services
         {
             RegisterDto result = new();
 
-            if(_userService.CheckUsernameIfExists(request.Username))
-            {
-                result.Success = false;
-                result.Message = "Username has already existed";
-
-                return result;
-            }
-
-            if (_userService.CheckEmailIfExists(request.Username))
-            {
-                result.Success = false;
-                result.Message = "Email has already existed";
-
-                return result;
-            }
-
             SystemUser user = new()
             {
                 Name = request.Username,
@@ -121,9 +103,9 @@ namespace FoodRestaurantApp_BE.Services
                 IsActive = true,
             };
 
-            bool registered = await _userService.CreateAsync(user);
+            DbDMLStatementResult statementResult = await _userService.CreateAsync(user);
 
-            if(registered) {
+            if(statementResult.Success) {
                 result.Success = true;
                 result.Message = "Registration succeeded";
             } else{

@@ -1,11 +1,15 @@
 ﻿
 using FoodRestaurantApp_BE.DbContexts;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FoodRestaurantApp_BE.Repositories
 {
     public class Repository<T>(FoodRestaurantDbContext dbContext) : IRepository<T> where T: class
     {
         protected readonly FoodRestaurantDbContext _dbContext = dbContext;
+
+        private IDbContextTransaction? DbTransaction;
+
 
         public async Task<int> InsertRangeAsync(IEnumerable<T> t)
         {
@@ -61,6 +65,29 @@ namespace FoodRestaurantApp_BE.Repositories
         {
             _dbContext.UpdateRange(t);
             return await _dbContext.SaveChangesAsync();
+        }
+
+        public void BeginTransaction()
+        {
+            DbTransaction = _dbContext.Database.BeginTransaction();
+        }
+
+        public void Commit()
+        {
+            if(DbTransaction != null)
+            {
+                DbTransaction.Commit();
+                DbTransaction.Dispose();
+            }
+        }
+
+        public void Rollback()
+        {
+            if(DbTransaction != null)
+            {
+                DbTransaction.Rollback();
+                DbTransaction.Dispose();
+            }
         }
     }
 }

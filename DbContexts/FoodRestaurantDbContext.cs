@@ -93,6 +93,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.LastLogin).HasColumnName("last_login");
                 e.Property(x => x.Uuid).HasColumnName("uuid").IsRequired();
                 e.Property(x => x.Avatar).HasColumnName("avatar").IsRequired(false);
+                e.Property(x => x.IsAdmin).HasColumnName("is_admin").IsRequired(true);
             });
 
             modelBuilder.Entity<SystemUser>().HasIndex(e => e.Name).IsUnique();
@@ -107,6 +108,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.Id).HasColumnName("id").IsRequired();
                 e.Property(x => x.Name).HasColumnName("name").IsRequired().HasMaxLength(10);
                 e.Property(x => x.Description).HasColumnName("description").IsRequired().HasMaxLength(50);
+                e.Property(x => x.Editable).HasColumnName("editable").IsRequired().HasDefaultValue(true);
             });
 
             modelBuilder.Entity<SystemUser>()
@@ -194,9 +196,26 @@ namespace FoodRestaurantApp_BE.DbContexts {
 
             // Seeding data
             modelBuilder.Entity<Role>().HasData([
-                new Role((int) Constants.Roles.ADMIN, "ADMIN", "Quản trị hệ thống"),
-                new Role((int) Constants.Roles.NVIEN, "NVIEN", "Nhân viên"),
-                new Role((int) Constants.Roles.KHHANG, "KHHANG", "Khách hàng mua sắm"),
+                new Role() {
+                    Id = (int) Constants.Roles.ADMIN, 
+                    Name = nameof(Constants.Roles.ADMIN), 
+                    Description = "Quản trị hệ thống", 
+                    Editable = false 
+                },
+                new Role()
+                {
+                    Id = (int) Constants.Roles.NVIEN,
+                    Name = nameof(Constants.Roles.NVIEN),
+                    Description = "Nhân viên",
+                    Editable = false
+                },
+                new Role()
+                {
+                    Id = (int)Constants.Roles.KHHANG,
+                    Name = nameof(Constants.Roles.ADMIN),
+                    Description = "Khách hàng mua sắm",
+                    Editable = false
+                },
             ]);
 
             modelBuilder.Entity<SystemUser>().HasData([
@@ -210,6 +229,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
                     Password = BCrypt.Net.BCrypt.HashPassword("123456"),
                     CreatedDate = DateTime.Now,
                     IsActive = true,
+                    IsAdmin = true,
                     RoleId = (int) Constants.Roles.ADMIN
                 }
             ]);

@@ -6,7 +6,8 @@
         public required string Name { get; set; }
         public required string FullName { get; set; }
         public required string Email { get; set; }
-        public required RoleModelResponse Role { get; set; }
+        public required bool IsActive { get; set; }
+        public required RoleModelResponse Role { get; set; } = null!;
     }
 
     public class UserShortDetailModelResponse

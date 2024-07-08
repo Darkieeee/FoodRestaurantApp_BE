@@ -12,31 +12,92 @@ namespace FoodRestaurantApp_BE.Services
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IRoleRepository _roleRepository = roleRepository;
 
-        public bool Create(SystemUser user)
+        public DbDMLStatementResult Create(SystemUser user)
         {
             return CreateAsync(user).Result;
         }
 
-        public async Task<bool> CreateAsync(SystemUser user)
+        public async Task<DbDMLStatementResult> CreateAsync(SystemUser user)
         {
-            return await _userRepository.InsertAsync(user) > 0;
+            string? uniqueValueFailed = CheckUniqueValue(user);
+            DbDMLStatementResult result = new();
+
+            if (!uniqueValueFailed.IsNullOrEmpty())
+            {
+                result.Success = false;
+                result.Message = uniqueValueFailed;
+
+                return result;
+            }
+            bool created = await _userRepository.InsertAsync(user) > 0;
+            
+            if(created) {
+                result.Success = true;
+                result.Message = "Add new users successfully";
+            }
+            else
+            {
+                result.Success = false;
+                result.Message = "Add new users unsuccessfully";
+            }
+
+            return result;
         }
 
-        public bool Update(SystemUser user)
+        private string? CheckUniqueValue(SystemUser user)
+        {
+            if(CheckUsernameIfExists(user.Name))
+            {
+                return "Username has already existed";
+            }
+            else if(CheckEmailIfExists(user.Email))
+            {
+                return "Email has already existed";
+            } 
+            else
+            {
+                return null;
+            }    
+        }
+
+        public DbDMLStatementResult Update(SystemUser user)
         {
             return UpdateAsync(user).Result;
         }
 
-        public async Task<bool> UpdateAsync(SystemUser user)
+        public async Task<DbDMLStatementResult> UpdateAsync(SystemUser user)
         {
-            return await _userRepository.UpdateAsync(user) > 0;
+            string? uniqueValueFailed = CheckUniqueValue(user);
+            DbDMLStatementResult result = new();
+
+            if (!uniqueValueFailed.IsNullOrEmpty())
+            {
+                result.Success = false;
+                result.Message = uniqueValueFailed;
+
+                return result;
+            }
+            bool created = await _userRepository.UpdateAsync(user) > 0;
+
+            if (created)
+            {
+                result.Success = true;
+                result.Message = "Add new users successfully";
+            }
+            else
+            {
+                result.Success = false;
+                result.Message = "Add new users unsuccessfully";
+            }
+
+            return result;
         }
 
         public List<UserShortDetailModelResponse> GetAll() {
             return _userRepository.GetAll().Select(x => GetShortInformation(x)).ToList();
         }
 
-        public async Task<SystemUser?> Authenticate(string username, string password)
+        public async Task<UserDetailModelResponse?> Authenticate(string username, string password)
         {
             SystemUser? user = _userRepository.FindByName(username)
                                               .Include(x => x.Role)
@@ -46,7 +107,7 @@ namespace FoodRestaurantApp_BE.Services
                 user.LastLogin = DateTime.Now;
                 await UpdateAsync(user);
 
-                return user;
+                return GetDetailInformation(user, user.Role);
             }
             return null;
         }
@@ -59,11 +120,8 @@ namespace FoodRestaurantApp_BE.Services
                 Uuid = user.Uuid,
                 Name = user.Name,
                 FullName = user.FullName,
-                Role = new RoleModelResponse()
-                {
-                    RoleId = role.Id,
-                    RoleName = role.Name,
-                }
+                IsActive = user.IsActive,
+                Role = new RoleModelResponse() { RoleId = role.Id, RoleName = role.Name }
             };
         }
 

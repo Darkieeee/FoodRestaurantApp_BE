@@ -130,9 +130,7 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasColumnName("description");
 
                     b.Property<bool>("Editable")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true)
                         .HasColumnName("editable");
 
                     b.Property<string>("Name")
@@ -311,7 +309,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 8, 18, 3, 11, 248, DateTimeKind.Local).AddTicks(7923))
+                        .HasDefaultValue(new DateTime(2024, 7, 8, 18, 15, 20, 86, DateTimeKind.Local).AddTicks(272))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -378,15 +376,15 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 7, 8, 18, 3, 11, 439, DateTimeKind.Local).AddTicks(6732),
+                            CreatedDate = new DateTime(2024, 7, 8, 18, 15, 20, 381, DateTimeKind.Local).AddTicks(3282),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
                             IsAdmin = true,
                             Name = "admin",
-                            Password = "$2a$11$1XbctSqrLxhhFXj9RFfkHOAvAeIgIo.2lIwAW4b3tqUqg.MS98yLy",
+                            Password = "$2a$11$cKdsDbdBVz19WTgIWZXA7...gjkORL40gsS/4fN574sko5wIa3Y3u",
                             RoleId = 1,
-                            Uuid = "3e1e1155-3617-4b7b-9044-a79ff6bce168"
+                            Uuid = "a6d8a16f-db42-4afa-a716-b9f3511c5b0e"
                         });
                 });
 

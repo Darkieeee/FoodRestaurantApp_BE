@@ -108,7 +108,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(x => x.Id).HasColumnName("id").IsRequired();
                 e.Property(x => x.Name).HasColumnName("name").IsRequired().HasMaxLength(10);
                 e.Property(x => x.Description).HasColumnName("description").IsRequired().HasMaxLength(50);
-                e.Property(x => x.Editable).HasColumnName("editable").IsRequired().HasDefaultValue(true);
+                e.Property(x => x.Editable).HasColumnName("editable").IsRequired();
             });
 
             modelBuilder.Entity<SystemUser>()

@@ -47,7 +47,7 @@ namespace FoodRestaurantApp_BE.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    editable = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                    editable = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -127,7 +127,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     full_name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 8, 18, 3, 11, 248, DateTimeKind.Local).AddTicks(7923)),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 8, 18, 15, 20, 86, DateTimeKind.Local).AddTicks(272)),
                     is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     is_admin = table.Column<bool>(type: "bit", nullable: false),
                     role_id = table.Column<int>(type: "int", maxLength: 10, nullable: false),
@@ -209,18 +209,18 @@ namespace FoodRestaurantApp_BE.Migrations
 
             migrationBuilder.InsertData(
                 table: "Roles",
-                columns: new[] { "id", "description", "name" },
+                columns: new[] { "id", "description", "editable", "name" },
                 values: new object[,]
                 {
-                    { 1, "Quản trị hệ thống", "ADMIN" },
-                    { 2, "Nhân viên", "NVIEN" },
-                    { 3, "Khách hàng mua sắm", "ADMIN" }
+                    { 1, "Quản trị hệ thống", false, "ADMIN" },
+                    { 2, "Nhân viên", false, "NVIEN" },
+                    { 3, "Khách hàng mua sắm", false, "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "uid", "avatar", "created_date", "email", "full_name", "is_active", "is_admin", "last_login", "name", "password", "role_id", "uuid" },
-                values: new object[] { 1, null, new DateTime(2024, 7, 8, 18, 3, 11, 439, DateTimeKind.Local).AddTicks(6732), "admin@gmail.com", "Quản trị hệ thống", true, true, null, "admin", "$2a$11$1XbctSqrLxhhFXj9RFfkHOAvAeIgIo.2lIwAW4b3tqUqg.MS98yLy", 1, "3e1e1155-3617-4b7b-9044-a79ff6bce168" });
+                values: new object[] { 1, null, new DateTime(2024, 7, 8, 18, 15, 20, 381, DateTimeKind.Local).AddTicks(3282), "admin@gmail.com", "Quản trị hệ thống", true, true, null, "admin", "$2a$11$cKdsDbdBVz19WTgIWZXA7...gjkORL40gsS/4fN574sko5wIa3Y3u", 1, "a6d8a16f-db42-4afa-a716-b9f3511c5b0e" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Foods_food_type",

@@ -28,7 +28,7 @@ namespace FoodRestaurantApp_BE.Services
 
         public async Task<AuthResponse> VerifyUserAsync(string username, string password, bool isAdmin)
         {
-            UserDetailModelResponse? user = await _userService.Authenticate(username, password, isAdmin);
+            UserShortDetails? user = await _userService.Authenticate(username, password, isAdmin);
             AuthResponse result = new();
 
             if (user != null)
@@ -45,7 +45,7 @@ namespace FoodRestaurantApp_BE.Services
                     result.Success = true;
                     result.Message = "Valid authentication";
                     result.UserName = user.Name;
-                    result.RoleName = user.Role?.RoleName ?? "";
+                    result.RoleName = user.Role.Description;
                     result.Token = token;
                 }
             }
@@ -58,14 +58,14 @@ namespace FoodRestaurantApp_BE.Services
             return result;
         }
 
-        private string GenerateToken(UserDetailModelResponse user, string secretKey, int expiredMinutes = 10)
+        private string GenerateToken(UserShortDetails user, string secretKey, int expiredMinutes = 10)
         {
             JwtSecurityTokenHandler _webTokenHandler = new();
 
             List<Claim> claims = [
                 new("uid", user.Uuid),
                 new(ClaimTypes.Name, user.Name),
-                new(ClaimTypes.Role, user.Role?.RoleName ?? ""),
+                new(ClaimTypes.Role, user.Role.Name ?? ""),
             ];
 
             byte[] secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
@@ -103,7 +103,7 @@ namespace FoodRestaurantApp_BE.Services
                 IsAdmin = false
             };
 
-            DbDMLStatementResult statementResult = await _userService.CreateAsync(user);
+            OperationResult statementResult = await _userService.CreateAsync(user);
 
             if(statementResult.Success) {
                 result.Success = true;

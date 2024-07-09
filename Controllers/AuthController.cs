@@ -54,7 +54,7 @@ namespace FoodRestaurantApp_BE.Controllers
         }
 
         [HttpPost("sign-up")]
-        public async Task<ActionResult> SignUp(IValidator<SignUpDto> validator,[FromBody] SignUpDto request)
+        public async Task<ActionResult> SignUp(IValidator<SignUpDto> validator,[FromForm] SignUpDto request)
         {
             var validated = await validator.ValidateAsync(request);
 

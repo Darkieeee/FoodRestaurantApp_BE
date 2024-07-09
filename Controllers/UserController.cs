@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using FoodRestaurantApp_BE.Constants;
-using FoodRestaurantApp_BE.Exceptions;
 using FoodRestaurantApp_BE.Filters;
 using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
@@ -24,8 +24,19 @@ namespace FoodRestaurantApp_BE.Controllers
         private readonly ILogger<UserController> _logger = logger;
 
         [HttpPost("create")]
-        public async Task<ActionResult> CreateUser([FromForm] CreateUserRequest request)
+        public async Task<ActionResult> CreateUser([FromForm] CreateUserRequest request, IValidator<CreateUserRequest> validator)
         {
+            var validated = validator.Validate(request);
+            if (!validated.IsValid) 
+            {
+                StatusResponse errorResponse = new()
+                {
+                    Success = false,
+                    Messages = validated.Errors.Select(x => x.ErrorMessage).ToList()
+                };
+                return BadRequest(errorResponse);
+            }
+
             SystemUser user = _mapper.Map<SystemUser>(request);
             
             if(request.Avatar != null)
@@ -39,7 +50,7 @@ namespace FoodRestaurantApp_BE.Controllers
 
             try
             {
-                DbDMLStatementResult result = await _userService.CreateAsync(user);
+                OperationResult result = await _userService.CreateAsync(user);
                 return result.Success ? Ok(result) : BadRequest(result);
             }
             catch(SqlException)
@@ -59,16 +70,8 @@ namespace FoodRestaurantApp_BE.Controllers
         [HttpGet("uuid/{uuid}")]
         public IActionResult GetByUuid(string uuid)
         {
-            UserDetailModelResponse? userDetail = _userService.GetByUuid(uuid);
-            
-            if(userDetail != null)
-            {
-                return Ok(userDetail);
-            }
-            else 
-            {
-                throw new NotFoundException($"Not found user with uuid {uuid}", null);
-            }
+            UserDetails userDetail = _userService.GetByUuid(uuid);
+            return Ok(userDetail);
         }
 
         [HttpGet("get-pagination")]

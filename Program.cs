@@ -45,6 +45,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodTypeRepository, FoodTypeRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 #endregion
 
 #region Add loggers to the container
@@ -59,6 +61,8 @@ builder.Logging.AddFoodRestaurantFileLogger(options => {
 #region Add services to the container
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IOrderSystemService, OrderSystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
@@ -66,6 +70,7 @@ builder.Services.AddScoped<IFoodTypeService, FoodTypeService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IFileService, ImageFileService>();
 builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
+builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserValidator>();
 builder.Services.AddScoped<IValidator<CreateFoodTypeRequest>, CreateFoodTypeValidator>();
 builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();
 builder.Services.AddScoped<LoggingFilter>();

@@ -1,4 +1,5 @@
-﻿using FoodRestaurantApp_BE.Models.Databases;
+﻿using FoodRestaurantApp_BE.Exceptions;
+using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
@@ -7,28 +8,23 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FoodRestaurantApp_BE.Services
 {
-    public class UserService(IUserRepository userRepository, IRoleRepository roleRepository) : IUserService
+    public class UserService(IUserRepository userRepository, IRoleRepository roleRepository,
+                             IRolePermissionRepository rolePermissionRepository, 
+                             IPermissionRepository permissionRepository) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IRoleRepository _roleRepository = roleRepository;
+        private readonly IRolePermissionRepository _rolePermissionRepository = rolePermissionRepository;
+        private readonly IPermissionRepository _permissionRepository = permissionRepository;
 
-        public DbDMLStatementResult Create(SystemUser user)
+        public OperationResult Create(SystemUser user)
         {
             return CreateAsync(user).Result;
         }
 
-        public async Task<DbDMLStatementResult> CreateAsync(SystemUser user)
-        {
-            string? uniqueValueFailed = CheckUniqueValue(user);
-            DbDMLStatementResult result = new();
-
-            if (!uniqueValueFailed.IsNullOrEmpty())
-            {
-                result.Success = false;
-                result.Message = uniqueValueFailed;
-
-                return result;
-            }
+        public async Task<OperationResult> CreateAsync(SystemUser user)
+        {            
+            OperationResult result = new();
             bool created = await _userRepository.InsertAsync(user) > 0;
             
             if(created) {
@@ -44,60 +40,36 @@ namespace FoodRestaurantApp_BE.Services
             return result;
         }
 
-        private string? CheckUniqueValue(SystemUser user)
-        {
-            if(CheckUsernameIfExists(user.Name))
-            {
-                return "Username has already existed";
-            }
-            else if(CheckEmailIfExists(user.Email))
-            {
-                return "Email has already existed";
-            } 
-            else
-            {
-                return null;
-            }    
-        }
-
-        public DbDMLStatementResult Update(SystemUser user)
+        public OperationResult Update(SystemUser user)
         {
             return UpdateAsync(user).Result;
         }
 
-        public async Task<DbDMLStatementResult> UpdateAsync(SystemUser user)
-        {
-            string? uniqueValueFailed = CheckUniqueValue(user);
-            DbDMLStatementResult result = new();
+        public async Task<OperationResult> UpdateAsync(SystemUser user)
+        {            
+            OperationResult result = new();
 
-            if (!uniqueValueFailed.IsNullOrEmpty())
-            {
-                result.Success = false;
-                result.Message = uniqueValueFailed;
+            bool updated = await _userRepository.UpdateAsync(user) > 0;
 
-                return result;
-            }
-            bool created = await _userRepository.UpdateAsync(user) > 0;
-
-            if (created)
+            if(updated)
             {
                 result.Success = true;
-                result.Message = "Add new users successfully";
+                result.Message = "Updated user successfully";
             }
             else
             {
                 result.Success = false;
-                result.Message = "Add new users unsuccessfully";
+                result.Message = "Updated user unsuccessfully";
             }
 
             return result;
         }
 
-        public List<UserShortDetailModelResponse> GetAll() {
-            return _userRepository.GetAll().Select(x => GetShortInformation(x)).ToList();
+        public List<UserListView> GetAll() {
+            return _userRepository.GetAll().Select(x => GetUserListView(x)).ToList();
         }
 
-        public async Task<UserDetailModelResponse?> Authenticate(string username, string password, bool isAdmin)
+        public async Task<UserShortDetails?> Authenticate(string username, string password, bool isAdmin)
         {
             SystemUser? user = _userRepository.FindByNameAndIsAdmin(username, isAdmin)
                                               .Include(x => x.Role)
@@ -107,32 +79,52 @@ namespace FoodRestaurantApp_BE.Services
                 user.LastLogin = DateTime.Now;
                 await UpdateAsync(user);
 
-                return GetDetailInformation(user, user.Role);
+                return GetShortUserDetails(user);
             }
             return null;
         }
 
-        private static UserDetailModelResponse GetDetailInformation(SystemUser user, Role role)
+        private static UserListView GetUserListView(SystemUser user)
         {
-            return new UserDetailModelResponse()
+            return new UserListView()
             {
                 Email = user.Email,
                 Uuid = user.Uuid,
                 Name = user.Name,
+                Avatar = user.Avatar,
                 FullName = user.FullName,
                 IsActive = user.IsActive,
-                Role = new RoleModelResponse() { RoleId = role.Id, RoleName = role.Name }
             };
         }
 
-        private static UserShortDetailModelResponse GetShortInformation(SystemUser user)
+        private static UserDetails GetUserDetail(SystemUser user, RoleDetails roleDetails)
         {
-            return new UserShortDetailModelResponse()
+            return new UserDetails()
+            {
+                Uuid = user.Uuid,
+                Name = user.Name,
+                Email = user.Email,
+                Avatar = user.Avatar,
+                FullName = user.FullName,
+                IsActive = user.IsActive,
+                Role = roleDetails
+            };
+        }
+
+        private static UserShortDetails GetShortUserDetails(SystemUser user)
+        {
+            return new UserShortDetails()
             {
                 Email = user.Email,
                 Uuid = user.Uuid,
-                FullName = user.FullName,
                 Name = user.Name,
+                Avatar = user.Avatar,
+                FullName = user.FullName,
+                IsActive = user.IsActive,
+                Role = new RoleListView() { 
+                    Description = user.Role.Description, 
+                    Name = user.Role.Name 
+                }
             };
         }
 
@@ -146,55 +138,102 @@ namespace FoodRestaurantApp_BE.Services
             return _userRepository.FindByEmail(email).Any();
         }
 
-        public Pagination<UserDetailModelResponse> GetPagination(string? search, PageSizeOption pageSizeOption, int currentPage)
+        private async Task<List<UserDetails>> JoinUserData(List<SystemUser> users)
+        {
+            List<Role> roles = await _roleRepository.FindByIds(users.Select(x => x.RoleId).ToList()).ToListAsync();
+
+            Dictionary<int, List<string>> rolespermissions = await _rolePermissionRepository.FindByRoleIds(roles.Select(x => x.Id).ToList())
+                                                                                            .GroupBy(x => x.RoleId)
+                                                                                            .ToDictionaryAsync(k => k.Key,
+                                                                                                               v => v.Select(x => x.PermissionId).ToList());
+            List<string> permissionIds = rolespermissions.SelectMany(x => x.Value).ToList();
+
+            Dictionary<string, PermissionDto> permissions = await _permissionRepository.FindByIds(permissionIds)
+                                                                                       .ToDictionaryAsync(k => k.Id,
+                                                                                                          v => new PermissionDto() { Id = v.Id, Name = v.Name });
+
+            Dictionary<int, RoleDetails> roleDetailsDict = roles.ToDictionary(k => k.Id, 
+                                                                              v => new RoleDetails() { 
+                                                                                  Description = v.Description, 
+                                                                                  Editable = v.Editable, 
+                                                                                  Name = v.Name, 
+                                                                                  Permissions = rolespermissions[v.Id].Select(x => permissions[x]).ToList() });
+
+            List<UserDetails> userDetailsList = [];
+            
+            users.ForEach(u => {
+                userDetailsList.Add(GetUserDetail(u, roleDetailsDict[u.RoleId]));
+            });
+
+            return userDetailsList;
+        }
+
+        private async Task<UserDetails> JoinUserData(SystemUser user)
+        {
+            Role role = await _roleRepository.FindById(user.RoleId).FirstAsync();
+            List<string> permissionIds = _rolePermissionRepository.FindByRoleId(user.RoleId)
+                                                                  .Select(x => x.PermissionId)
+                                                                  .ToList();
+            List<PermissionDto> permissions = _permissionRepository.FindByIds(permissionIds)
+                                                                   .Select(x => new PermissionDto() { Id = x.Id, Name = x.Name })
+                                                                   .ToList();
+            RoleDetails roleDetails =  new()
+            {
+                Name = role.Name,
+                Description = role.Description,
+                Editable = true,
+                Permissions = permissions
+            };
+
+            return GetUserDetail(user, roleDetails);
+        }
+
+        public Pagination<UserShortDetails> GetPagination(string? search, PageSizeOption pageSizeOption, int currentPage)
         {
             var users = _userRepository.GetAll();
-            var roles = _roleRepository.GetAll().ToList();
+            
+            var permissions = _permissionRepository.GetAll().ToList();
 
             if(!search.IsNullOrEmpty())
             {
-                users = users.Where(x => x.FullName.Contains(search!, StringComparison.OrdinalIgnoreCase));
+                users = users.Where(x => x.FullName.Contains(search!));
             }
 
             int totalCount = users.Count();
 
-            IEnumerable<UserDetailModelResponse> userRoleJoin = users.Join(roles,
-                                                                           user => user.RoleId, role => role.Id,
-                                                                           GetDetailInformation);
-            
-            
             int pageSize = (int) pageSizeOption;
             int totalPage = (int) Math.Ceiling((double) totalCount / pageSize);
             int skipRows = (currentPage - 1) * pageSize;
-            List<UserDetailModelResponse> userDetailModelResponses = userRoleJoin.Skip(skipRows)
-                                                                                 .Take(pageSize)
-                                                                                 .ToList();
+            List<SystemUser> userList = users.OrderBy(x => x.Name).Skip(skipRows).Take(pageSize).ToList();
+            List<Role> roles = _roleRepository.FindByIds(users.Select(x => x.RoleId).ToList()).ToList();
+            IEnumerable<UserShortDetails> userRoleJoin = userList.Join(roles,
+                                                                       user => user.RoleId, role => role.Id,
+                                                                       (user, role) => {
+                                                                           user.Role = role;
+                                                                           return GetShortUserDetails(user);
+                                                                       });
 
-            Pagination<UserDetailModelResponse> pagination;
-            pagination = PaginationHelper.CreateBuilder<UserDetailModelResponse>()
+            Pagination<UserShortDetails> pagination;
+            pagination = PaginationHelper.CreateBuilder<UserShortDetails>()
                                          .WithCurrentPage(currentPage)
                                          .WithPageSize(pageSizeOption)
-                                         .WithData(userDetailModelResponses, totalCount, totalPage)
+                                         .WithData(userRoleJoin.ToList(), totalCount, totalPage)
                                          .Build();
             return pagination;
         }
 
-        public UserDetailModelResponse? GetById(int id)
+        public UserDetails GetById(int id)
         {
-            UserDetailModelResponse? user = _userRepository.FindById(id)
-                                                           .Include(x => x.Role)
-                                                           .Select(x => GetDetailInformation(x, x.Role))
-                                                           .FirstOrDefault();
-            return user;
+            SystemUser? user = _userRepository.FindById(id)
+                                              .FirstOrDefault();
+            return user is null ? throw new NotFoundException($"Not found user with id {id}", null) : JoinUserData(user).Result;
         }
 
-        public UserDetailModelResponse? GetByUuid(string uuid)
+        public UserDetails GetByUuid(string uuid)
         {
-            UserDetailModelResponse? user = _userRepository.FindByUuid(uuid)
-                                                           .Include(x => x.Role)
-                                                           .Select(x => GetDetailInformation(x, x.Role))
-                                                           .FirstOrDefault();
-            return user;
+            SystemUser? user = _userRepository.FindByUuid(uuid)
+                                              .FirstOrDefault();
+            return user is null ? throw new NotFoundException($"Not found user with uuid {uuid}", null) : JoinUserData(user).Result;
         }
     }
 }

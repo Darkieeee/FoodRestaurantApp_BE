@@ -1,5 +1,4 @@
-﻿using Azure;
-using FoodRestaurantApp_BE.Models.DTOs;
+﻿using FoodRestaurantApp_BE.Models.DTOs;
 
 namespace FoodRestaurantApp_BE.Services.Abstracts
 {

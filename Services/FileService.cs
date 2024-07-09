@@ -1,10 +1,11 @@
 ﻿using FoodRestaurantApp_BE.Services.Abstracts;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FoodRestaurantApp_BE.Services
 {
     public class FileService : IFileService
     {
-        public bool CheckFileIfExists(string filepath)
+        public bool CheckFileIfExists(string? filepath)
         {
             return File.Exists(filepath);
         }
@@ -22,9 +23,21 @@ namespace FoodRestaurantApp_BE.Services
             throw new NotImplementedException();
         }
 
-        public FileStream GetFileContent(string filepath)
+        public string? GetFileContent(string? filepath)
         {
-            throw new NotImplementedException();
+            if(!filepath.IsNullOrEmpty() && CheckFileIfExists(filepath))
+            {
+                try
+                {
+                    byte[] content = File.ReadAllBytes(filepath!);
+                    return Convert.ToBase64String(content);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            return null;
         }
 
         public virtual bool IsFileSupported(IFormFile file)
@@ -34,6 +47,11 @@ namespace FoodRestaurantApp_BE.Services
 
         public async Task<string> UploadFile(string directory, IFormFile file)
         {
+            if(file == null || file.Length == 0)
+            {
+                throw new ArgumentException("File cannot be null or empty.");
+            }
+            
             if(!IsFileSupported(file))
             {
                 throw new NotSupportedException($"File with extension {file.ContentType} is not supported");
@@ -44,19 +62,41 @@ namespace FoodRestaurantApp_BE.Services
                 Directory.CreateDirectory(directory);
             }
 
-            string newFileName = string.Format("{0}_{1}{2}", Path.GetFileNameWithoutExtension(file.FileName) ?? "", 
-                                                             DateTime.Now.ToString("ddMMyyyyHHmmss"), 
-                                                             Path.GetExtension(file.FileName) ?? "");
-            string path = Path.Combine(directory, newFileName);
+            string fileName = Path.GetRandomFileName() + Path.GetExtension(file.FileName);  
+            string path = Path.Combine(directory, fileName);
+
             using Stream stream = File.Create(path);
             await file.CopyToAsync(stream);
 
             return path;
         }
 
-        public void UploadFiles(string directory, IEnumerable<IFormFile> file)
+        public async Task<List<string>> UploadFiles(string directory, IEnumerable<IFormFile> files)
         {
-            throw new NotImplementedException();
+            if(files == null)
+            {
+                throw new ArgumentNullException(nameof(files));
+            }
+            
+            try
+            {
+                List<string> result = [];
+                foreach (IFormFile file in files)
+                {
+                    string filePath = await UploadFile(directory, file);
+                    result.Add(filePath);
+                }
+                return result;
+            }
+            catch
+            {
+                if(Path.Exists(directory)) 
+                {
+                    var dir = new DirectoryInfo(directory);
+                    dir.Delete(true);
+                }
+                throw;
+            }
         }
     }
 }

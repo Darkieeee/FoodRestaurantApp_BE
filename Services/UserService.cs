@@ -5,6 +5,7 @@ using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace FoodRestaurantApp_BE.Services
 {
@@ -97,7 +98,7 @@ namespace FoodRestaurantApp_BE.Services
             };
         }
 
-        private static UserDetails GetUserDetail(SystemUser user, RoleDetails roleDetails)
+        private static UserDetails GetUserDetails(SystemUser user, RoleDetails roleDetails)
         {
             return new UserDetails()
             {
@@ -108,6 +109,29 @@ namespace FoodRestaurantApp_BE.Services
                 FullName = user.FullName,
                 IsActive = user.IsActive,
                 Role = roleDetails
+            };
+        }
+
+        private static UserDetails GetUserDetails(SystemUser user)
+        {
+            return new UserDetails()
+            {
+                Email = user.Email,
+                FullName = user.FullName,
+                Avatar = user.Avatar,
+                IsActive = user.IsActive,
+                Name = user.Name,
+                Uuid = user.Uuid,
+                Role = new RoleDetails()
+                {
+                    Description = user.Role.Description,
+                    Editable = user.Role.Editable,
+                    Name = user.Role.Name,
+                    Permissions = user.Role.Permissions.Select(x => new PermissionDto { 
+                        Id = x.Id, 
+                        Name = x.Name 
+                    }).ToList(),
+                }
             };
         }
 
@@ -162,7 +186,7 @@ namespace FoodRestaurantApp_BE.Services
             List<UserDetails> userDetailsList = [];
             
             users.ForEach(u => {
-                userDetailsList.Add(GetUserDetail(u, roleDetailsDict[u.RoleId]));
+                userDetailsList.Add(GetUserDetails(u, roleDetailsDict[u.RoleId]));
             });
 
             return userDetailsList;
@@ -185,15 +209,13 @@ namespace FoodRestaurantApp_BE.Services
                 Permissions = permissions
             };
 
-            return GetUserDetail(user, roleDetails);
+            return GetUserDetails(user, roleDetails);
         }
 
         public Pagination<UserShortDetails> GetPagination(string? search, PageSizeOption pageSizeOption, int currentPage)
         {
             var users = _userRepository.GetAll();
             
-            var permissions = _permissionRepository.GetAll().ToList();
-
             if(!search.IsNullOrEmpty())
             {
                 users = users.Where(x => x.FullName.Contains(search!));
@@ -204,36 +226,50 @@ namespace FoodRestaurantApp_BE.Services
             int pageSize = (int) pageSizeOption;
             int totalPage = (int) Math.Ceiling((double) totalCount / pageSize);
             int skipRows = (currentPage - 1) * pageSize;
-            List<SystemUser> userList = users.OrderBy(x => x.Name).Skip(skipRows).Take(pageSize).ToList();
-            List<Role> roles = _roleRepository.FindByIds(users.Select(x => x.RoleId).ToList()).ToList();
+
+            /*List<SystemUser> userList = users.OrderBy(x => x.Name).Skip(skipRows).Take(pageSize).ToList();
+            List<Role> roles = _roleRepository.FindByIds(userList.Select(x => x.RoleId).Distinct().ToList()).ToList();
             IEnumerable<UserShortDetails> userRoleJoin = userList.Join(roles,
                                                                        user => user.RoleId, role => role.Id,
-                                                                       (user, role) => {
+                                                                       (user, role) =>
+                                                                       {
                                                                            user.Role = role;
                                                                            return GetShortUserDetails(user);
-                                                                       });
+                                                                       });*/
+
+            List<UserShortDetails> userShortDetails = users.OrderBy(x => x.Name)
+                                                           .Skip(skipRows).Take(pageSize)
+                                                           .Select(x => GetShortUserDetails(x))
+                                                           .ToList();
 
             Pagination<UserShortDetails> pagination;
             pagination = PaginationHelper.CreateBuilder<UserShortDetails>()
                                          .WithCurrentPage(currentPage)
                                          .WithPageSize(pageSizeOption)
-                                         .WithData(userRoleJoin.ToList(), totalCount, totalPage)
+                                         .WithData(userShortDetails, totalCount, totalPage)
                                          .Build();
+
             return pagination;
         }
 
         public UserDetails GetById(int id)
         {
-            SystemUser? user = _userRepository.FindById(id)
-                                              .FirstOrDefault();
-            return user is null ? throw new NotFoundException($"Not found user with id {id}", null) : JoinUserData(user).Result;
+            UserDetails? user1 = _userRepository.FindById(id)
+                                                .Include(x => x.Role)
+                                                .ThenInclude(x => x.Permissions)
+                                                .Select(x => GetUserDetails(x))
+                                                .FirstOrDefault();
+            return user1 is null ? throw new NotFoundException($"Not found user with id {id}", null) : user1;
         }
 
         public UserDetails GetByUuid(string uuid)
         {
-            SystemUser? user = _userRepository.FindByUuid(uuid)
-                                              .FirstOrDefault();
-            return user is null ? throw new NotFoundException($"Not found user with uuid {uuid}", null) : JoinUserData(user).Result;
+            UserDetails? user = _userRepository.FindByUuid(uuid)
+                                               .Include(x => x.Role)
+                                               .ThenInclude(x => x.Permissions)
+                                               .Select(x => GetUserDetails(x))
+                                               .FirstOrDefault();
+            return user is null ? throw new NotFoundException($"Not found user with uuid {uuid}", null) : user;
         }
     }
 }

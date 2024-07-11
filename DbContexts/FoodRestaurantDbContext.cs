@@ -58,6 +58,7 @@ namespace FoodRestaurantApp_BE.DbContexts {
                 e.Property(e => e.Slug).HasColumnName("slug").HasMaxLength(250).IsRequired();
                 e.Property(e => e.TypeId).HasColumnName("food_type").IsRequired();
                 e.Property(e => e.MaxToppings).HasColumnName("max_toppings").HasDefaultValue(0);
+                e.Property(e => e.Image).HasColumnName("image").IsRequired(false);
             });
 
             modelBuilder.Entity<Food>()
@@ -232,6 +233,157 @@ namespace FoodRestaurantApp_BE.DbContexts {
                     IsAdmin = true,
                     RoleId = (int) Constants.Roles.ADMIN
                 }
+            ]);
+
+            modelBuilder.Entity<Permission>().HasData([
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM001),
+                    Name = Constants.Permissions.ADM001
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM002),
+                    Name = Constants.Permissions.ADM002
+                },
+                new Permission
+                { 
+                    Id = nameof(Constants.Permissions.ADM003),
+                    Name = Constants.Permissions.ADM003
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM004),
+                    Name = Constants.Permissions.ADM004
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM005),
+                    Name = Constants.Permissions.ADM005
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM006),
+                    Name = Constants.Permissions.ADM006
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM007),
+                    Name = Constants.Permissions.ADM007
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM008),
+                    Name = Constants.Permissions.ADM008
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM009),
+                    Name = Constants.Permissions.ADM009
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM010),
+                    Name = Constants.Permissions.ADM010
+                },
+                new Permission
+                {
+                    Id = nameof(Constants.Permissions.ADM011),
+                    Name = Constants.Permissions.ADM011
+                }
+            ]);
+
+            modelBuilder.Entity<RolePermission>().HasData([
+                #region Seed default permissions for admin
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM001)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM002)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM003)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM004)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM005)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM006)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM007)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM008)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM009)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM010)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.ADMIN,
+                    PermissionId = nameof(Constants.Permissions.ADM011)
+                },
+                #endregion
+
+                #region Seed default permissions for employee
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.NVIEN,
+                    PermissionId = nameof(Constants.Permissions.ADM001)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.NVIEN,
+                    PermissionId = nameof(Constants.Permissions.ADM002)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.NVIEN,
+                    PermissionId = nameof(Constants.Permissions.ADM003)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.NVIEN,
+                    PermissionId = nameof(Constants.Permissions.ADM004)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.NVIEN,
+                    PermissionId = nameof(Constants.Permissions.ADM006)
+                },
+                new RolePermission
+                {
+                    RoleId = (int) Constants.Roles.NVIEN,
+                    PermissionId = nameof(Constants.Permissions.ADM007)
+                },
+                #endregion
             ]);
         }
     }

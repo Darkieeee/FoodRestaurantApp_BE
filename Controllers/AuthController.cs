@@ -22,7 +22,7 @@ namespace FoodRestaurantApp_BE.Controllers
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] SignInRequest request)
-        {    
+        {
             AuthResponse result = await _authService.VerifyUserAsync(request.Username, request.Password, false);
             return result.Success ? Ok(result) : BadRequest(result);
         }

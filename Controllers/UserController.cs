@@ -8,26 +8,26 @@ using FoodRestaurantApp_BE.Services;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace FoodRestaurantApp_BE.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    [ValidToken(AllowedRoles = [nameof(Roles.ADMIN)])]
+    [ValidToken]
+    [CanAccess(Permissions = [nameof(Permissions.ADM009)])]
     [ApiController]
-    public class UserController(IUserService userService, IFileService fileService, 
+    public class UserController(IUserService userService, IFileService fileService,
                                 IMapper mapper, ILogger<UserController> logger) : ControllerBase {
         private readonly IUserService _userService = userService;
         private readonly IMapper _mapper = mapper;
-        private readonly IFileService _fileService = (ImageFileService) fileService;
+        private readonly IFileService _fileService = (ImageFileService)fileService;
         private readonly ILogger<UserController> _logger = logger;
 
         [HttpPost("create")]
         public async Task<ActionResult> CreateUser([FromForm] CreateUserRequest request, IValidator<CreateUserRequest> validator)
         {
             var validated = validator.Validate(request);
-            if (!validated.IsValid) 
+            if (!validated.IsValid)
             {
                 StatusResponse errorResponse = new()
                 {
@@ -38,32 +38,28 @@ namespace FoodRestaurantApp_BE.Controllers
             }
 
             SystemUser user = _mapper.Map<SystemUser>(request);
-            
-            if(request.Avatar != null)
+
+            if (request.Avatar != null)
             {
                 string mainDirectory = Environment.CurrentDirectory;
                 string subDirectory = Path.Combine("Images", "Avatar");
-                string fileUploadedUri = await _fileService.UploadFile(Path.Combine(mainDirectory, subDirectory), 
+                string fileUploadedUri = await _fileService.UploadFile(Path.Combine(mainDirectory, subDirectory),
                                                                        request.Avatar);
                 user.Avatar = fileUploadedUri;
             }
 
-            try
+            OperationResult<SystemUser> result = await _userService.CreateAsync(user);
+            if (result.Success)
             {
-                OperationResult result = await _userService.CreateAsync(user);
-                return result.Success ? Ok(result) : BadRequest(result);
+                return Ok(result);
             }
-            catch(SqlException)
+            else
             {
                 if (user.Avatar != null && _fileService.CheckFileIfExists(user.Avatar))
                 {
                     _fileService.DeleteFile(user.Avatar);
                 }
-                throw;
-            }
-            catch
-            {
-                throw;
+                return BadRequest(result);
             }
         }
 

@@ -4,8 +4,6 @@ using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System;
 
 namespace FoodRestaurantApp_BE.Services
 {
@@ -18,51 +16,67 @@ namespace FoodRestaurantApp_BE.Services
         private readonly IRolePermissionRepository _rolePermissionRepository = rolePermissionRepository;
         private readonly IPermissionRepository _permissionRepository = permissionRepository;
 
-        public OperationResult Create(SystemUser user)
+        public OperationResult<SystemUser> Create(SystemUser user)
         {
             return CreateAsync(user).Result;
         }
 
-        public async Task<OperationResult> CreateAsync(SystemUser user)
+        public async Task<OperationResult<SystemUser>> CreateAsync(SystemUser user)
         {            
-            OperationResult result = new();
-            bool created = await _userRepository.InsertAsync(user) > 0;
-            
-            if(created) {
-                result.Success = true;
-                result.Message = "Add new users successfully";
-            }
-            else
+            OperationResult<SystemUser> result = new();
+            try 
+            {
+                bool created = await _userRepository.InsertAsync(user) > 0;
+
+                if (created)
+                {
+                    result.Success = true;
+                    result.Message = "Add new user successfully";
+                    result.Value = user;
+                }
+                else
+                {
+                    result.Success = false;
+                    result.Message = "Add new user unsuccessfully";
+                }
+            } catch(Exception ex)
             {
                 result.Success = false;
-                result.Message = "Add new users unsuccessfully";
+                result.Message = ex.Message;
+                result.Exception = ex;
             }
-
             return result;
         }
 
-        public OperationResult Update(SystemUser user)
+        public OperationResult<SystemUser> Update(SystemUser user)
         {
             return UpdateAsync(user).Result;
         }
 
-        public async Task<OperationResult> UpdateAsync(SystemUser user)
+        public async Task<OperationResult<SystemUser>> UpdateAsync(SystemUser user)
         {            
-            OperationResult result = new();
-
-            bool updated = await _userRepository.UpdateAsync(user) > 0;
-
-            if(updated)
+            OperationResult<SystemUser> result = new();
+            try
             {
-                result.Success = true;
-                result.Message = "Updated user successfully";
-            }
-            else
+                bool updated = await _userRepository.UpdateAsync(user) > 0;
+
+                if (updated)
+                {
+                    result.Success = true;
+                    result.Message = "Updated user successfully";
+                    result.Value = user;
+                }
+                else
+                {
+                    result.Success = false;
+                    result.Message = "Updated user unsuccessfully";
+                }
+            } catch(Exception ex)
             {
                 result.Success = false;
-                result.Message = "Updated user unsuccessfully";
+                result.Message = ex.Message;
+                result.Exception = ex;
             }
-
             return result;
         }
 
@@ -146,6 +160,7 @@ namespace FoodRestaurantApp_BE.Services
                 FullName = user.FullName,
                 IsActive = user.IsActive,
                 Role = new RoleListView() { 
+                    Id = user.Role.Id,
                     Description = user.Role.Description, 
                     Name = user.Role.Name 
                 }
@@ -164,7 +179,8 @@ namespace FoodRestaurantApp_BE.Services
 
         private async Task<List<UserDetails>> JoinUserData(List<SystemUser> users)
         {
-            List<Role> roles = await _roleRepository.FindByIds(users.Select(x => x.RoleId).ToList()).ToListAsync();
+            List<int> roleIds = users.Select(x => x.RoleId).ToList();
+            List<Role> roles = await _roleRepository.FindByIds(roleIds).ToListAsync();
 
             Dictionary<int, List<string>> rolespermissions = await _rolePermissionRepository.FindByRoleIds(roles.Select(x => x.Id).ToList())
                                                                                             .GroupBy(x => x.RoleId)
@@ -216,7 +232,7 @@ namespace FoodRestaurantApp_BE.Services
         {
             var users = _userRepository.GetAll();
             
-            if(!search.IsNullOrEmpty())
+            if(!string.IsNullOrEmpty(search))
             {
                 users = users.Where(x => x.FullName.Contains(search!));
             }
@@ -239,6 +255,7 @@ namespace FoodRestaurantApp_BE.Services
 
             List<UserShortDetails> userShortDetails = users.OrderBy(x => x.Name)
                                                            .Skip(skipRows).Take(pageSize)
+                                                           .Include(x => x.Role)
                                                            .Select(x => GetShortUserDetails(x))
                                                            .ToList();
 

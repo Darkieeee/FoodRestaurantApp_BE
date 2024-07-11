@@ -10,12 +10,12 @@ namespace FoodRestaurantApp_BE.Services.Abstracts
         [Obsolete("The method is considered less secure for user data information. Use GetByUuid() instead")]
         UserDetails GetById(int id);
         UserDetails GetByUuid(string uuid);
-        OperationResult Create(SystemUser user);
-        OperationResult Update(SystemUser user);
+        OperationResult<SystemUser> Create(SystemUser user);
+        OperationResult<SystemUser> Update(SystemUser user);
         bool CheckUsernameIfExists(string username);
         bool CheckEmailIfExists(string email);
         Task<UserShortDetails?> Authenticate(string username, string password, bool isAdmin);
-        Task<OperationResult> UpdateAsync(SystemUser user);
-        Task<OperationResult> CreateAsync(SystemUser user);
+        Task<OperationResult<SystemUser>> UpdateAsync(SystemUser user);
+        Task<OperationResult<SystemUser>> CreateAsync(SystemUser user);
     }
 }

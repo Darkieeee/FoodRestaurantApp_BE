@@ -1,5 +1,4 @@
-﻿using FoodRestaurantApp_BE.Controllers;
-using FoodRestaurantApp_BE.Middlewares;
+﻿using FoodRestaurantApp_BE.Middlewares;
 
 namespace FoodRestaurantApp_BE.Extensions
 {

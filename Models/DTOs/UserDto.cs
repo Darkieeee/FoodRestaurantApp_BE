@@ -22,7 +22,7 @@ namespace FoodRestaurantApp_BE.Models.DTOs
         public required string FullName { get; set; }
         public required string Email { get; set; }
         public required bool IsActive { get; set; }
-        public required RoleListView Role { get; set; } 
+        public required RoleListView Role { get; set; } = null!;
         public string? Avatar { get; set; }
     }
 
@@ -43,6 +43,7 @@ namespace FoodRestaurantApp_BE.Models.DTOs
         public required string Email { get; set; }
         public required string Password { get; set; }
         public required string Role { get; set; }
+        public required bool IsAdmin { get; set; }
         public IFormFile? Avatar { get; set; } = null;
     }
 

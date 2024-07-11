@@ -154,6 +154,7 @@ app.UseAuthorization();
 app.UseHttpLogging();
 
 app.UseTokenValidation();
+app.UseGrantAccessApi();
 
 app.MapControllers();
 app.MapSwagger().RequireAuthorization();

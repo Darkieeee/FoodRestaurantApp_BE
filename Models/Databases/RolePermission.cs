@@ -2,8 +2,8 @@
 {
     public class RolePermission
     {
-        public int RoleId { get; set; }
-        public string PermissionId { get; set; } = string.Empty;
+        public required int RoleId { get; set; }
+        public required string PermissionId { get; set; }
         public virtual Role Role { get; set; } = null!;
         public virtual Permission Permission { get; set; } = null!;
     }

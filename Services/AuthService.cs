@@ -45,6 +45,7 @@ namespace FoodRestaurantApp_BE.Services
                     result.Success = true;
                     result.Message = "Valid authentication";
                     result.UserName = user.Name;
+                    result.IsAdmin = isAdmin;
                     result.RoleName = user.Role.Description;
                     result.Token = token;
                 }
@@ -63,9 +64,9 @@ namespace FoodRestaurantApp_BE.Services
             JwtSecurityTokenHandler _webTokenHandler = new();
 
             List<Claim> claims = [
-                new("uid", user.Uuid),
+                new(ClaimTypes.Actor, user.Uuid),
                 new(ClaimTypes.Name, user.Name),
-                new(ClaimTypes.Role, user.Role.Name ?? ""),
+                new(ClaimTypes.Role, user.Role.Name),
             ];
 
             byte[] secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
@@ -103,7 +104,7 @@ namespace FoodRestaurantApp_BE.Services
                 IsAdmin = false
             };
 
-            OperationResult statementResult = await _userService.CreateAsync(user);
+            OperationResult<SystemUser> statementResult = await _userService.CreateAsync(user);
 
             if(statementResult.Success) {
                 result.Success = true;

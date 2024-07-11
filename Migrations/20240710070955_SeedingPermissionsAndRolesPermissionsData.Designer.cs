@@ -4,6 +4,7 @@ using FoodRestaurantApp_BE.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodRestaurantApp_BE.Migrations
 {
     [DbContext(typeof(FoodRestaurantDbContext))]
-    partial class FoodRestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240710070955_SeedingPermissionsAndRolesPermissionsData")]
+    partial class SeedingPermissionsAndRolesPermissionsData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,10 +39,6 @@ namespace FoodRestaurantApp_BE.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("description");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
 
                     b.Property<int>("MaxToppings")
                         .ValueGeneratedOnAdd()
@@ -300,36 +299,6 @@ namespace FoodRestaurantApp_BE.Migrations
                         {
                             RoleId = 1,
                             PermissionId = "ADM011"
-                        },
-                        new
-                        {
-                            RoleId = 2,
-                            PermissionId = "ADM001"
-                        },
-                        new
-                        {
-                            RoleId = 2,
-                            PermissionId = "ADM002"
-                        },
-                        new
-                        {
-                            RoleId = 2,
-                            PermissionId = "ADM003"
-                        },
-                        new
-                        {
-                            RoleId = 2,
-                            PermissionId = "ADM004"
-                        },
-                        new
-                        {
-                            RoleId = 2,
-                            PermissionId = "ADM006"
-                        },
-                        new
-                        {
-                            RoleId = 2,
-                            PermissionId = "ADM007"
                         });
                 });
 
@@ -457,7 +426,7 @@ namespace FoodRestaurantApp_BE.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 12, 1, 16, 46, 923, DateTimeKind.Local).AddTicks(7945))
+                        .HasDefaultValue(new DateTime(2024, 7, 10, 14, 9, 54, 704, DateTimeKind.Local).AddTicks(7489))
                         .HasColumnName("created_date");
 
                     b.Property<string>("Email")
@@ -524,15 +493,15 @@ namespace FoodRestaurantApp_BE.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 7, 12, 1, 16, 47, 232, DateTimeKind.Local).AddTicks(9689),
+                            CreatedDate = new DateTime(2024, 7, 10, 14, 9, 54, 921, DateTimeKind.Local).AddTicks(6621),
                             Email = "admin@gmail.com",
                             FullName = "Quản trị hệ thống",
                             IsActive = true,
                             IsAdmin = true,
                             Name = "admin",
-                            Password = "$2a$11$VlHV6iXHayBOhkmLM0gy/eMVt6yltcekVTjepoYEnReDI2AME0J3e",
+                            Password = "$2a$11$hW81/Pir1bX7GefAtK5J4u5kljbY3/ySMD3OtBin3sjh5nBUP5vVi",
                             RoleId = 1,
-                            Uuid = "f3264c05-9963-4e17-9dba-67ce3d2f1924"
+                            Uuid = "43c4a82d-7923-44f5-b8fd-d623a9ff6e8e"
                         });
                 });
 

@@ -12,7 +12,16 @@ namespace FoodRestaurantApp_BE.Services
         public List<PermissionDto> GetPermissions(int roleId)
         {
             return _rolePermissionRepository.FindByRoleId(roleId)
-                                            .Join(_permissionRepository.GetAll(),
+                                            .Join(_permissionRepository.GetAll().Select(x => new { x.Id, x.Name }),
+                                                  role => role.PermissionId, permission => permission.Id,
+                                                  (rolesPermissions, permission) => new PermissionDto() { Id = permission.Id, Name = permission.Name })
+                                            .ToList();
+        }
+
+        public List<PermissionDto> GetPermissions(string roleName)
+        {
+            return _rolePermissionRepository.FindByRoleName(roleName)
+                                            .Join(_permissionRepository.GetAll().Select(x => new { x.Id, x.Name }),
                                                   role => role.PermissionId, permission => permission.Id,
                                                   (rolesPermissions, permission) => new PermissionDto() { Id = permission.Id, Name = permission.Name })
                                             .ToList();

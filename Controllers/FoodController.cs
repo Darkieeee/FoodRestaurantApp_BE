@@ -2,6 +2,7 @@
 using FoodRestaurantApp_BE.Filters;
 using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
+using FoodRestaurantApp_BE.Services;
 using FoodRestaurantApp_BE.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,16 +13,50 @@ namespace FoodRestaurantApp_BE.Controllers
     [ApiController]
     [Authorize]
     [ValidToken]
-    public class FoodController(IFoodService foodService, IMapper mapper) : ControllerBase
+    public class FoodController(IFoodService foodService, IMapper mapper,
+                                IFileService fileService) : ControllerBase
     {
         private readonly IFoodService _foodService = foodService;
         private readonly IMapper _mapper = mapper;
+        private readonly IFileService _fileService = (ImageFileService)fileService;
 
         [HttpPost("create")]
-        public IActionResult CreateFood([FromBody] CreateFoodRequest request)
+        public async Task<IActionResult> CreateFood([FromForm] CreateFoodRequest request)
         {
             Food f = _mapper.Map<Food>(request);
-            return Ok(_foodService.CreateAsync(f));
+            if (request.Image != null)
+            {
+                string mainDirectory = Environment.CurrentDirectory;
+                string subDirectory = Path.Combine("Images", "Foods");
+                string fileUploadedUri = await _fileService.UploadFile(Path.Combine(mainDirectory, subDirectory),
+                                                                       request.Image);
+                f.Image = fileUploadedUri;
+            }
+            OperationResult<Food> result = await _foodService.CreateAsync(f);
+            if(result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                if(f.Image != null && _fileService.CheckFileIfExists(f.Image))
+                {
+                    _fileService.DeleteFile(f.Image);
+                }
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPost("update/{id}")]
+        public IActionResult UpdateFood(int id, [FromForm] CreateFoodRequest request)
+        {
+            return Ok();
+        }
+
+        [HttpGet("get-list")]
+        public IActionResult GetList()
+        {
+            return Ok(_foodService.GetAll());
         }
     }
 }

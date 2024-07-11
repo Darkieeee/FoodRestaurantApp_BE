@@ -19,13 +19,14 @@ namespace FoodRestaurantApp_BE.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpGet("get-list")]
+        [CanAccess(Permissions = [nameof(Constants.Permissions.ADM004)])]
         public IActionResult GetList()
         {
             return Ok(_foodTypeService.GetAll());
         }
 
-        // POST api/<FoodTypeController>
         [HttpPost("create")]
+        [CanAccess(Permissions = [nameof(Constants.Permissions.ADM005)])]
         public async Task<IActionResult> CreateFoodType([FromBody] CreateFoodTypeRequest request, IValidator<CreateFoodTypeRequest> validator)
         {
             var validated = await validator.ValidateAsync(request);
@@ -43,6 +44,13 @@ namespace FoodRestaurantApp_BE.Controllers
                 FoodType foodType = _mapper.Map<FoodType>(request);
                 return Ok(_foodTypeService.Create(foodType));
             }
+        }
+
+        [HttpPost("update/{id}")]
+        [CanAccess(Permissions = [nameof(Constants.Permissions.ADM005)])]
+        public IActionResult UpdateFoodType(int id, CreateFoodTypeRequest request)
+        {
+            return Ok();
         }
     }
 }

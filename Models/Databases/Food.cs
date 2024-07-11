@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace FoodRestaurantApp_BE.Models.Databases
+﻿namespace FoodRestaurantApp_BE.Models.Databases
 {
     public class Food {
         public required int Id { get; set; }
@@ -10,6 +8,7 @@ namespace FoodRestaurantApp_BE.Models.Databases
         public int MaxToppings { get; set; }
         public required string Slug { get; set; }
         public int TypeId { get; set; }
+        public string? Image { get; set; }
         public virtual FoodType Type { get; set; } = null!;
         public ICollection<SystemOrder> SystemOrders = new List<SystemOrder>();
     }

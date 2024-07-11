@@ -1,9 +1,9 @@
 ﻿namespace FoodRestaurantApp_BE.Models.Databases
 {
-    public class Permission(string id, string name)
+    public class Permission
     {
-        public string Id { get; set; } = id;
-        public string Name { get; set; } = name;
+        public required string Id { get; set; }
+        public required string Name { get; set; }
         public ICollection<Role> Roles { get; set; } = new List<Role>();
     }
 }

@@ -22,7 +22,6 @@ namespace FoodRestaurantApp_BE.Services
         public List<FoodTypeModelResponse> GetAll()
         {
             return _foodTypeRepository.GetAll().Select(x => new FoodTypeModelResponse() {
-                Id = x.Id,
                 Name = x.Name,
                 Slug = x.Slug,
             }).ToList();

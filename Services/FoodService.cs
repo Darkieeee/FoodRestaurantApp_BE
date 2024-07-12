@@ -2,6 +2,7 @@
 using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodRestaurantApp_BE.Services
 {
@@ -42,6 +43,23 @@ namespace FoodRestaurantApp_BE.Services
             return result;
         }
 
+        private static FoodDetails ToDetails(Food f)
+        {
+            return new FoodDetails()
+            {
+                Description = f.Description,
+                MaxToppings = f.MaxToppings,
+                Name = f.Name,
+                Price = f.Price,
+                Image = f.Image,
+                FoodType = new FoodTypeModelResponse()
+                {
+                    Name = f.Name,
+                    Slug = f.Slug,
+                }
+            };
+        } 
+
         private static FoodListView ToListView(Food f)
         {
             return new FoodListView()
@@ -57,6 +75,47 @@ namespace FoodRestaurantApp_BE.Services
         public List<FoodListView> GetAll()
         {
             return _foodRepository.GetAll().Select(x => ToListView(x)).ToList();
+        }
+
+        public Pagination<FoodDetails> GetPagination(string? search, PageSizeOption pageSizeOption, int currentPage)
+        {
+            var foods = _foodRepository.GetAll();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                foods = foods.Where(x => x.Name.Contains(search!));
+            }
+
+            int totalCount = foods.Count();
+
+            int pageSize = (int) pageSizeOption;
+            int totalPage = (int) Math.Ceiling((double) totalCount / pageSize);
+            int skipRows = (currentPage - 1) * pageSize;
+
+            List<FoodDetails> FoodDetails = foods.OrderBy(x => x.Name)
+                                                           .Skip(skipRows).Take(pageSize)
+                                                           .Include(x => x.Type)
+                                                           .Select(x => ToDetails(x))
+                                                           .ToList();
+
+            Pagination<FoodDetails> pagination;
+            pagination = PaginationHelper.CreateBuilder<FoodDetails>()
+                                         .WithCurrentPage(currentPage)
+                                         .WithPageSize(pageSizeOption)
+                                         .WithData(FoodDetails, totalCount, totalPage)
+                                         .Build();
+
+            return pagination;
+        }
+
+        public FoodDetails GetBySlug(string slug)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<FoodBestSeller> TakeTopSellingFoods(int top)
+        {
+            return _foodRepository.FindBestSellingFoods(top).ToList();
         }
     }
 }

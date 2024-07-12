@@ -24,7 +24,7 @@ namespace FoodRestaurantApp_BE.Models.Logging
             }
 
             var fullfilePath = string.Format("{0}/{1}", _provider.Options.FolderPath,
-                                                            _provider.Options.FilePath.Replace("{date}", DateTime.Now.ToString("yyyyMMdd")));
+                                                        _provider.Options.FilePath.Replace("{date}", DateTime.Now.ToString("yyyyMMdd")));
             var logRecord = string.Format("{0} [{1}] {2} {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                                                                logLevel.ToString(),
                                                                formatter(state, exception),

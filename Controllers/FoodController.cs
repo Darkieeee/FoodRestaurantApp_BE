@@ -53,10 +53,22 @@ namespace FoodRestaurantApp_BE.Controllers
             return Ok();
         }
 
+        [HttpGet("top-seller")]
+        public IActionResult TakeTopSellingFood(int top)
+        {
+            return Ok(_foodService.TakeTopSellingFoods(top));
+        }
+
         [HttpGet("get-list")]
         public IActionResult GetList()
         {
             return Ok(_foodService.GetAll());
+        }
+
+        [HttpGet("get-pagination")]
+        public IActionResult GetPagination(string? search, PageSizeOption option = PageSizeOption.TenPerPage, int page = 1) 
+        {
+            return Ok();
         }
     }
 }

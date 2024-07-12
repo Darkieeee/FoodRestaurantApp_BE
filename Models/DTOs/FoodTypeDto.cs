@@ -5,7 +5,6 @@ namespace FoodRestaurantApp_BE.Models.DTOs
 {
     public class FoodTypeModelResponse
     {
-        public required int Id { get; set; }
         public required string Name { get; set; }
         public required string Slug { get; set; }
     }

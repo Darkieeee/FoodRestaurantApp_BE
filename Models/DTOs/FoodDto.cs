@@ -5,9 +5,11 @@ namespace FoodRestaurantApp_BE.Models.DTOs
 {
     public class FoodListView
     {
+        public required int Id { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public required int Price { get; set; }
+        public required string Url { get; set; }
         [JsonPropertyName("max_toppings")]
         public int MaxToppings { get; set; }
         [JsonPropertyName("img")]
@@ -16,32 +18,36 @@ namespace FoodRestaurantApp_BE.Models.DTOs
 
     public class FoodDetails
     {
+        public required int Id { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public required int Price { get; set; }
+        public required string Url { get; set; }
         [JsonPropertyName("max_toppings")]
         public required int MaxToppings { get; set; }
         [JsonPropertyName("img")]
         public string? Image { get; set; }
         [JsonPropertyName("food_type")]
-        public FoodTypeModelResponse FoodType { get; set; } = null!;
+        public FoodTypeListView FoodType { get; set; } = null!;
     }
 
     public class FoodBestSeller
     {
+        public required int Id { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public required int Price { get; set; }
+        public required string Url { get; set; }
         [JsonPropertyName("max_toppings")]
         public required int MaxToppings { get; set; }
         [JsonPropertyName("img")]
         public string? Image { get; set; }
         [JsonPropertyName("food_type")]
-        public FoodTypeModelResponse FoodType { get; set; } = null!;
+        public FoodTypeListView FoodType { get; set; } = null!;
         public int NumberOfSales { get; set; }
     }
 
-    public class CreateFoodRequest
+    public class StoreUpdateFoodRequest
     {
         [FromForm(Name = "name")]
         public required string Name { get; set; }

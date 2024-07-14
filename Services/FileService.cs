@@ -73,11 +73,7 @@ namespace FoodRestaurantApp_BE.Services
 
         public async Task<List<string>> UploadFiles(string directory, IEnumerable<IFormFile> files)
         {
-            if(files == null)
-            {
-                throw new ArgumentNullException(nameof(files));
-            }
-            
+            ArgumentNullException.ThrowIfNull(files, nameof(files));
             try
             {
                 List<string> result = [];

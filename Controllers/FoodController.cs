@@ -21,7 +21,7 @@ namespace FoodRestaurantApp_BE.Controllers
         private readonly IFileService _fileService = (ImageFileService)fileService;
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateFood([FromForm] CreateFoodRequest request)
+        public async Task<IActionResult> CreateFood([FromForm] StoreUpdateFoodRequest request)
         {
             Food f = _mapper.Map<Food>(request);
             if (request.Image != null)
@@ -48,15 +48,21 @@ namespace FoodRestaurantApp_BE.Controllers
         }
 
         [HttpPost("update/{id}")]
-        public IActionResult UpdateFood(int id, [FromForm] CreateFoodRequest request)
+        public IActionResult UpdateFood(int id, [FromForm] StoreUpdateFoodRequest request)
         {
             return Ok();
         }
 
-        [HttpGet("top-seller")]
+        [HttpGet("best-seller")]
         public IActionResult TakeTopSellingFood(int top)
         {
             return Ok(_foodService.TakeTopSellingFoods(top));
+        }
+
+        [HttpGet("detail")]
+        public IActionResult GetDetail(string slug, int id)
+        {
+            return Ok(_foodService.GetBySlugAndId(slug, id));
         }
 
         [HttpGet("get-list")]
@@ -68,7 +74,13 @@ namespace FoodRestaurantApp_BE.Controllers
         [HttpGet("get-pagination")]
         public IActionResult GetPagination(string? search, PageSizeOption option = PageSizeOption.TenPerPage, int page = 1) 
         {
-            return Ok();
+            return Ok(_foodService.GetPagination(search, option, page));
+        }
+
+        [HttpPost("delete/{id}")]
+        public async Task<IActionResult> DeleteFood(int id)
+        {
+            return Ok(await _foodService.DeleteAsync(id));
         }
     }
 }

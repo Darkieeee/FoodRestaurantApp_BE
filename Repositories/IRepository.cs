@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
 
 namespace FoodRestaurantApp_BE.Repositories
 {
@@ -14,7 +15,7 @@ namespace FoodRestaurantApp_BE.Repositories
         Task<int> InsertRangeAsync(IEnumerable<T> t);
         Task<int> UpdateRangeAsync(IEnumerable<T> t);
         Task<int> DeleteRangeAsync(IEnumerable<T> t);
-        void BeginTransaction();
+        void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
         void Commit();
         void Rollback();
     }

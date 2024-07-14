@@ -27,10 +27,10 @@ namespace FoodRestaurantApp_BE.Controllers
 
         [HttpPost("create")]
         [CanAccess(Permissions = [nameof(Constants.Permissions.ADM005)])]
-        public async Task<IActionResult> CreateFoodType([FromBody] CreateFoodTypeRequest request, IValidator<CreateFoodTypeRequest> validator)
+        public async Task<IActionResult> CreateFoodType([FromBody] StoreUpdateFoodTypeRequest request, IValidator<StoreUpdateFoodTypeRequest> validator, CancellationToken cancellationToken)
         {
-            var validated = await validator.ValidateAsync(request);
-            if(!validated.IsValid)
+            var validated = await validator.ValidateAsync(request, cancellationToken);
+            if (!validated.IsValid)
             {
                 StatusResponse response = new()
                 {
@@ -48,9 +48,29 @@ namespace FoodRestaurantApp_BE.Controllers
 
         [HttpPost("update/{id}")]
         [CanAccess(Permissions = [nameof(Constants.Permissions.ADM005)])]
-        public IActionResult UpdateFoodType(int id, CreateFoodTypeRequest request)
+        public async Task<IActionResult> UpdateFoodType(int id, StoreUpdateFoodTypeRequest request, IValidator<StoreUpdateFoodTypeRequest> validator, CancellationToken cancellationToken)
         {
-            return Ok();
+            var validated = await validator.ValidateAsync(request, cancellationToken);
+            if (!validated.IsValid)
+            {
+                StatusResponse response = new()
+                {
+                    Success = false,
+                    Messages = validated.Errors.Select(x => x.ErrorMessage).ToList()
+                };
+                return BadRequest(response);
+            }
+            FoodType foodType = _mapper.Map<FoodType>(request);
+            foodType.Id = id;
+
+            return Ok(_foodTypeService.Update(foodType));
+        }
+
+        [HttpPost("delete/{id}")]
+        [CanAccess(Permissions = [nameof(Constants.Permissions.ADM005)])]
+        public IActionResult DeleteFoodType(int id)
+        {
+            return Ok(_foodTypeService.Delete(id));
         }
     }
 }

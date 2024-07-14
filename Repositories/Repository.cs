@@ -1,6 +1,7 @@
-﻿
-using FoodRestaurantApp_BE.DbContexts;
+﻿using FoodRestaurantApp_BE.DbContexts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 
 namespace FoodRestaurantApp_BE.Repositories
 {
@@ -67,9 +68,9 @@ namespace FoodRestaurantApp_BE.Repositories
             return await _dbContext.SaveChangesAsync();
         }
 
-        public void BeginTransaction()
+        public void BeginTransaction(IsolationLevel isolationLevel)
         {
-            DbTransaction = _dbContext.Database.BeginTransaction();
+            DbTransaction = _dbContext.Database.BeginTransaction(isolationLevel);
         }
 
         public void Commit()

@@ -6,7 +6,7 @@ namespace FoodRestaurantApp_BE.Repositories
     public interface IFoodRepository : IRepository<Food>
     {
         IQueryable<Food> FindById(int id);
-        IQueryable<Food> FindBySlug(string slug);
+        IQueryable<Food> FindBySlugAndId(string slug, int id);
         IQueryable<FoodBestSeller> FindBestSellingFoods(int top);
         IQueryable<Food> FindRelatedFoods(string slug);
     }

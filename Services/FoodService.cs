@@ -1,4 +1,5 @@
-﻿using FoodRestaurantApp_BE.Models.Databases;
+﻿using FoodRestaurantApp_BE.Exceptions;
+using FoodRestaurantApp_BE.Models.Databases;
 using FoodRestaurantApp_BE.Models.DTOs;
 using FoodRestaurantApp_BE.Repositories;
 using FoodRestaurantApp_BE.Services.Abstracts;
@@ -47,13 +48,16 @@ namespace FoodRestaurantApp_BE.Services
         {
             return new FoodDetails()
             {
+                Id = f.Id,
                 Description = f.Description,
                 MaxToppings = f.MaxToppings,
                 Name = f.Name,
                 Price = f.Price,
                 Image = f.Image,
-                FoodType = new FoodTypeModelResponse()
+                Url = $"{f.Slug}-fid{f.Id}",
+                FoodType = new FoodTypeListView()
                 {
+                    Id = f.Id,
                     Name = f.Name,
                     Slug = f.Slug,
                 }
@@ -64,11 +68,13 @@ namespace FoodRestaurantApp_BE.Services
         {
             return new FoodListView()
             {
+                Id = f.Id,
                 Name = f.Name,
                 Price = f.Price,
                 Description = f.Description,
                 Image = f.Image,
-                MaxToppings = f.MaxToppings
+                MaxToppings = f.MaxToppings,
+                Url = $"{f.Slug}-fid{f.Id}"
             };
         }
 
@@ -93,10 +99,10 @@ namespace FoodRestaurantApp_BE.Services
             int skipRows = (currentPage - 1) * pageSize;
 
             List<FoodDetails> FoodDetails = foods.OrderBy(x => x.Name)
-                                                           .Skip(skipRows).Take(pageSize)
-                                                           .Include(x => x.Type)
-                                                           .Select(x => ToDetails(x))
-                                                           .ToList();
+                                                 .Skip(skipRows).Take(pageSize)
+                                                 .Include(x => x.Type)
+                                                 .Select(x => ToDetails(x))
+                                                 .ToList();
 
             Pagination<FoodDetails> pagination;
             pagination = PaginationHelper.CreateBuilder<FoodDetails>()
@@ -108,14 +114,22 @@ namespace FoodRestaurantApp_BE.Services
             return pagination;
         }
 
-        public FoodDetails GetBySlug(string slug)
+        public FoodDetails GetBySlugAndId(string slug, int id)
         {
-            throw new NotImplementedException();
+            Food? food = _foodRepository.FindBySlugAndId(slug, id).FirstOrDefault();
+            return food is null ? throw new NotFoundException($"Not found food with slug '{slug}' and id '{id}'", null) : ToDetails(food);
         }
 
         public List<FoodBestSeller> TakeTopSellingFoods(int top)
         {
             return _foodRepository.FindBestSellingFoods(top).ToList();
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            Food? food = _foodRepository.FindById(id).FirstOrDefault();
+            return food is null ? throw new NotFoundException($"Not found food with id '{id}'", null)
+                                : await _foodRepository.DeleteAsync(food) > 0;
         }
     }
 }

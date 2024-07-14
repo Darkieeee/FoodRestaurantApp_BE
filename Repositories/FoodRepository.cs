@@ -9,12 +9,12 @@ namespace FoodRestaurantApp_BE.Repositories
     {
         public IQueryable<Food> FindById(int id)
         {
-            return _dbContext.Foods.Where(x => x.Id == id);
+            return _dbContext.Foods.Where(x => x.Id.Equals(id));
         }
 
-        public IQueryable<Food> FindBySlug(string slug)
+        public IQueryable<Food> FindBySlugAndId(string slug, int id)
         {
-            return _dbContext.Foods.Where(x => x.Slug == slug);
+            return _dbContext.Foods.Where(x => x.Slug.Equals(slug) && x.Id.Equals(id));
         }
 
         public IQueryable<Food> FindRelatedFoods(string slug)
@@ -35,12 +35,14 @@ namespace FoodRestaurantApp_BE.Repositories
                                                          food => food.Id, topSeller => topSeller.Id,
                                                          (food, topSeller) => new FoodBestSeller()
                                                          {
+                                                             Id = food.Id,
                                                              Name = food.Name,
                                                              Price = food.Price,
                                                              Description = food.Description,
                                                              Image = food.Image,
                                                              MaxToppings = food.MaxToppings,
-                                                             NumberOfSales = topSeller.NumberOfSales
+                                                             NumberOfSales = topSeller.NumberOfSales,
+                                                             Url = $"{food.Slug}-fid{food.Id}"
                                                          })
                                                    .Take(top); 
             return bestSellingFoods;

@@ -5,10 +5,13 @@ namespace FoodRestaurantApp_BE.Services.Abstracts
 {
     public interface IFoodTypeService
     {
-        List<FoodTypeModelResponse> GetAll();
+        List<FoodTypeListView> GetAll();
+        FoodTypeListView GetById(int id);
         bool Create(FoodType type);
         bool Update(FoodType type);
+        bool Delete(int id);
         Task<bool> CreateAsync(FoodType type);
         Task<bool> UpdateAsync(FoodType type);
+        Task<bool> DeleteAsync(int id);
     }
 }

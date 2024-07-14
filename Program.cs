@@ -71,7 +71,7 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IFileService, ImageFileService>();
 builder.Services.AddScoped<IValidator<SignUpDto>, SignUpValidator>();
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserValidator>();
-builder.Services.AddScoped<IValidator<CreateFoodTypeRequest>, CreateFoodTypeValidator>();
+builder.Services.AddScoped<IValidator<StoreUpdateFoodTypeRequest>, StoreUpdateFoodTypeValidator>();
 builder.Services.AddTransient<ITokenBlacklistService, JwtTokenBlacklistService>();
 builder.Services.AddScoped<LoggingFilter>();
 #endregion

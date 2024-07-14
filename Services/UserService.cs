@@ -81,7 +81,7 @@ namespace FoodRestaurantApp_BE.Services
         }
 
         public List<UserListView> GetAll() {
-            return _userRepository.GetAll().Select(x => GetUserListView(x)).ToList();
+            return _userRepository.GetAll().Select(x => ToListView(x)).ToList();
         }
 
         public async Task<UserShortDetails?> Authenticate(string username, string password, bool isAdmin)
@@ -94,12 +94,12 @@ namespace FoodRestaurantApp_BE.Services
                 user.LastLogin = DateTime.Now;
                 await UpdateAsync(user);
 
-                return GetShortUserDetails(user);
+                return ToShortDetails(user);
             }
             return null;
         }
 
-        private static UserListView GetUserListView(SystemUser user)
+        private static UserListView ToListView(SystemUser user)
         {
             return new UserListView()
             {
@@ -112,21 +112,7 @@ namespace FoodRestaurantApp_BE.Services
             };
         }
 
-        private static UserDetails GetUserDetails(SystemUser user, RoleDetails roleDetails)
-        {
-            return new UserDetails()
-            {
-                Uuid = user.Uuid,
-                Name = user.Name,
-                Email = user.Email,
-                Avatar = user.Avatar,
-                FullName = user.FullName,
-                IsActive = user.IsActive,
-                Role = roleDetails
-            };
-        }
-
-        private static UserDetails GetUserDetails(SystemUser user)
+        private static UserDetails ToDetails(SystemUser user)
         {
             return new UserDetails()
             {
@@ -149,7 +135,7 @@ namespace FoodRestaurantApp_BE.Services
             };
         }
 
-        private static UserShortDetails GetShortUserDetails(SystemUser user)
+        private static UserShortDetails ToShortDetails(SystemUser user)
         {
             return new UserShortDetails()
             {
@@ -177,55 +163,80 @@ namespace FoodRestaurantApp_BE.Services
             return _userRepository.FindByEmail(email).Any();
         }
 
-        private async Task<List<UserDetails>> JoinUserData(List<SystemUser> users)
+        private async Task<List<UserDetails>> JoinUserDataAsync(IEnumerable<SystemUser> users)
         {
-            List<int> roleIds = users.Select(x => x.RoleId).ToList();
-            List<Role> roles = await _roleRepository.FindByIds(roleIds).ToListAsync();
+            List<int> roleIds = users.Select(x => x.RoleId).Distinct().ToList();
 
-            Dictionary<int, List<string>> rolespermissions = await _rolePermissionRepository.FindByRoleIds(roles.Select(x => x.Id).ToList())
-                                                                                            .GroupBy(x => x.RoleId)
-                                                                                            .ToDictionaryAsync(k => k.Key,
-                                                                                                               v => v.Select(x => x.PermissionId).ToList());
-            List<string> permissionIds = rolespermissions.SelectMany(x => x.Value).ToList();
+            var join1 = _rolePermissionRepository.FindByRoleIds(roleIds)
+                                                 .Join(_roleRepository.GetAll(),
+                                                       rolePermission => rolePermission.RoleId, role => role.Id,
+                                                       (rolePermission, role) => new { role.Id, role.Name, role.Description, role.Editable, rolePermission.PermissionId });
 
-            Dictionary<string, PermissionDto> permissions = await _permissionRepository.FindByIds(permissionIds)
-                                                                                       .ToDictionaryAsync(k => k.Id,
-                                                                                                          v => new PermissionDto() { Id = v.Id, Name = v.Name });
+            var join2 = join1.GroupJoin(_permissionRepository.GetAll().Select(x => new { x.Id, x.Name }),
+                                        (join1Item) => join1Item.PermissionId, permission => permission.Id,
+                                        (join1Item, permission) => new { 
+                                            join1Item.Id,
+                                            join1Item.Name, 
+                                            join1Item.Description, 
+                                            join1Item.Editable, 
+                                            Permissions = permission.Select(x => new PermissionDto() { Id = x.Id, Name = x.Name }) 
+                                        });
 
-            Dictionary<int, RoleDetails> roleDetailsDict = roles.ToDictionary(k => k.Id, 
-                                                                              v => new RoleDetails() { 
-                                                                                  Description = v.Description, 
-                                                                                  Editable = v.Editable, 
-                                                                                  Name = v.Name, 
-                                                                                  Permissions = rolespermissions[v.Id].Select(x => permissions[x]).ToList() });
+            List<RoleDetails> roleDetailsList = join2.Select(x => new RoleDetails() { 
+                Name = x.Name,
+                Description = x.Description,
+                Editable = x.Editable,
+                Permissions = x.Permissions.ToList()
+            }).ToList();
 
-            List<UserDetails> userDetailsList = [];
+            List<UserDetails> userDetailsList = await join2.Join(users,
+                                                                 join2Item => join2Item.Id, user => user.RoleId,
+                                                                 (join2Item, user) => new UserDetails { 
+                                                                     Email = user.Email,
+                                                                     FullName = user.FullName,
+                                                                     Name = user.Name,
+                                                                     Uuid = user.Uuid,
+                                                                     IsActive = user.IsActive,
+                                                                     Avatar = user.Avatar,
+                                                                     Role = new RoleDetails() {
+                                                                         Name = join2Item.Name,
+                                                                         Description = join2Item.Description,
+                                                                         Editable = join2Item.Editable,
+                                                                         Permissions = join2Item.Permissions.ToList()
+                                                                     }
+                                                                 }).ToListAsync();
             
-            users.ForEach(u => {
-                userDetailsList.Add(GetUserDetails(u, roleDetailsDict[u.RoleId]));
-            });
-
             return userDetailsList;
         }
 
-        private async Task<UserDetails> JoinUserData(SystemUser user)
+        private async Task<UserDetails> JoinUserDataAsync(SystemUser user)
         {
-            Role role = await _roleRepository.FindById(user.RoleId).FirstAsync();
-            List<string> permissionIds = _rolePermissionRepository.FindByRoleId(user.RoleId)
-                                                                  .Select(x => x.PermissionId)
-                                                                  .ToList();
-            List<PermissionDto> permissions = _permissionRepository.FindByIds(permissionIds)
-                                                                   .Select(x => new PermissionDto() { Id = x.Id, Name = x.Name })
-                                                                   .ToList();
-            RoleDetails roleDetails =  new()
+            var join1 = _rolePermissionRepository.FindByRoleId(user.RoleId)
+                                                 .Join(_roleRepository.GetAll(),
+                                                       rolePermission => rolePermission.RoleId, role => role.Id,
+                                                       (rolePermission, role) => new { role.Id, role.Name, role.Description, role.Editable, rolePermission.PermissionId });
+
+            RoleDetails roleDetails = await join1.GroupJoin(_permissionRepository.GetAll().Select(x => new { x.Id, x.Name }),
+                                                            (join1Item) => join1Item.PermissionId, permission => permission.Id,
+                                                            (join1Item, permission) => new RoleDetails {
+                                                                Name = join1Item.Name,
+                                                                Description = join1Item.Description,
+                                                                Editable = join1Item.Editable,
+                                                                Permissions = permission.Select(x => new PermissionDto() { Id = x.Id, Name = x.Name }).ToList()
+                                                            }).FirstAsync();
+
+            UserDetails userDetails = new()
             {
-                Name = role.Name,
-                Description = role.Description,
-                Editable = true,
-                Permissions = permissions
+                Email = user.Email,
+                FullName = user.FullName,
+                Name = user.Name,
+                Uuid = user.Uuid,
+                IsActive = user.IsActive,
+                Avatar = user.Avatar,
+                Role = roleDetails
             };
 
-            return GetUserDetails(user, roleDetails);
+            return userDetails;
         }
 
         public Pagination<UserShortDetails> GetPagination(string? search, PageSizeOption pageSizeOption, int currentPage)
@@ -243,20 +254,10 @@ namespace FoodRestaurantApp_BE.Services
             int totalPage = (int) Math.Ceiling((double) totalCount / pageSize);
             int skipRows = (currentPage - 1) * pageSize;
 
-            /*List<SystemUser> userList = users.OrderBy(x => x.Name).Skip(skipRows).Take(pageSize).ToList();
-            List<Role> roles = _roleRepository.FindByIds(userList.Select(x => x.RoleId).Distinct().ToList()).ToList();
-            IEnumerable<UserShortDetails> userRoleJoin = userList.Join(roles,
-                                                                       user => user.RoleId, role => role.Id,
-                                                                       (user, role) =>
-                                                                       {
-                                                                           user.Role = role;
-                                                                           return GetShortUserDetails(user);
-                                                                       });*/
-
             List<UserShortDetails> userShortDetails = users.OrderBy(x => x.Name)
                                                            .Skip(skipRows).Take(pageSize)
                                                            .Include(x => x.Role)
-                                                           .Select(x => GetShortUserDetails(x))
+                                                           .Select(x => ToShortDetails(x))
                                                            .ToList();
 
             Pagination<UserShortDetails> pagination;
@@ -274,7 +275,7 @@ namespace FoodRestaurantApp_BE.Services
             UserDetails? user1 = _userRepository.FindById(id)
                                                 .Include(x => x.Role)
                                                 .ThenInclude(x => x.Permissions)
-                                                .Select(x => GetUserDetails(x))
+                                                .Select(x => ToDetails(x))
                                                 .FirstOrDefault();
             return user1 is null ? throw new NotFoundException($"Not found user with id {id}", null) : user1;
         }
@@ -284,7 +285,7 @@ namespace FoodRestaurantApp_BE.Services
             UserDetails? user = _userRepository.FindByUuid(uuid)
                                                .Include(x => x.Role)
                                                .ThenInclude(x => x.Permissions)
-                                               .Select(x => GetUserDetails(x))
+                                               .Select(x => ToDetails(x))
                                                .FirstOrDefault();
             return user is null ? throw new NotFoundException($"Not found user with uuid {uuid}", null) : user;
         }

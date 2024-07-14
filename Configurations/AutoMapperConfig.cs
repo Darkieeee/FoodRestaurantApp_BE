@@ -14,13 +14,13 @@ namespace FoodRestaurantApp_BE.Configurations
                 dest.Password = BCrypt.Net.BCrypt.HashPassword(dest.Password);
                 dest.IsActive = true;
             });
-            CreateMap<CreateFoodRequest, Food>().ForMember(dest => dest.TypeId, 
-                                                           src => src.MapFrom(prop => prop.FoodType))
-                                                .AfterMap((src, dest) => {
-                                                    SlugHelper slugHelper = new();
-                                                    dest.Slug = slugHelper.GenerateSlug(dest.Name);
-                                                });
-            CreateMap<CreateFoodTypeRequest, FoodType>().AfterMap((src, dest) => {
+            CreateMap<StoreUpdateFoodRequest, Food>().ForMember(dest => dest.TypeId, 
+                                                                src => src.MapFrom(prop => prop.FoodType))
+                                                     .AfterMap((src, dest) => {
+                                                         SlugHelper slugHelper = new();
+                                                         dest.Slug = slugHelper.GenerateSlug(dest.Name);
+                                                     });
+            CreateMap<StoreUpdateFoodTypeRequest, FoodType>().AfterMap((src, dest) => {
                 SlugHelper slugHelper = new();
                 dest.Slug = slugHelper.GenerateSlug(dest.Name);
             });
